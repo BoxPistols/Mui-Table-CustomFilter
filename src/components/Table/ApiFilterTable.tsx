@@ -11,12 +11,15 @@ import {
   Box,
   FormControl,
   FormLabel,
+  IconButton,
   Pagination,
   TextField,
+  Typography,
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import { Visibility, Edit, Delete } from "@mui/icons-material";
 
 // API data type
 type Product = {
@@ -34,13 +37,18 @@ type Product = {
 };
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  padding: "0.75em 1.25em",
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
     color: theme.palette.common.white,
     cursor: "pointer",
+    fontWeight: 700,
+    fontSize: 16,
+    paddingLeft: "1.5em",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
+    paddingLeft: "1.75em",
   },
 }));
 
@@ -52,6 +60,27 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     border: 0,
   },
 }));
+
+// Action Cell
+const handleAction = (action: string, row: Product) => {
+  switch (action) {
+    case "detail":
+      alert(`Details: ${JSON.stringify(row)}`);
+      break;
+    case "edit":
+      // TODO: Implement edit action.
+      alert(`Edit URL for product ${row.id} would be opened.`);
+      break;
+    case "delete":
+      if (window.confirm(`Are you sure you want to delete ${row.title}?`)) {
+        // TODO: Implement delete action.
+        alert(`Product ${row.id} would be deleted.`);
+      }
+      break;
+    default:
+      break;
+  }
+};
 
 export const ApiFilterTable = () => {
   const [search, setSearch] = useState("");
@@ -158,19 +187,46 @@ export const ApiFilterTable = () => {
                 rating
                 {sortField === "rating" && SortIcon}
               </StyledTableCell>
+              <StyledTableCell align="center" width={140}>
+                Action
+              </StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedRows.map((row) => (
-              <StyledTableRow key={row.id}>
-                <StyledTableCell component="th" scope="row">
-                  {row.title}
+            {paginatedRows.length > 0 ? (
+              paginatedRows.map((row) => (
+                <StyledTableRow key={row.id}>
+                  <StyledTableCell component="th" scope="row">
+                    {row.title}
+                  </StyledTableCell>
+                  <StyledTableCell>{row.price}</StyledTableCell>
+                  <StyledTableCell>{row.stock}</StyledTableCell>
+                  <StyledTableCell>{row.rating}</StyledTableCell>
+                  <StyledTableCell align="right">
+                    <IconButton onClick={() => handleAction("detail", row)}>
+                      <Visibility />
+                    </IconButton>
+                    <IconButton onClick={() => handleAction("edit", row)}>
+                      <Edit />
+                    </IconButton>
+                    <IconButton onClick={() => handleAction("delete", row)}>
+                      <Delete />
+                    </IconButton>
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))
+            ) : (
+              <StyledTableRow>
+                <StyledTableCell
+                  component="th"
+                  scope="row"
+                  colSpan={5}
+                  sx={{ textAlign: "center" }}
+                >
+                  <Typography variant="h5">No results found.</Typography>
                 </StyledTableCell>
-                <StyledTableCell>{row.price}</StyledTableCell>
-                <StyledTableCell>{row.stock}</StyledTableCell>
-                <StyledTableCell>{row.rating}</StyledTableCell>
               </StyledTableRow>
-            ))}
+            )}
           </TableBody>{" "}
         </Table>
       </TableContainer>

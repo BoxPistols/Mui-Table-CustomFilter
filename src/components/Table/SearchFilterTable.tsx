@@ -13,6 +13,7 @@ import {
   FormLabel,
   IconButton,
   TextField,
+  Typography,
 } from "@mui/material";
 import { useState } from "react";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
@@ -63,7 +64,34 @@ const initialRows = [
   createData("Eclair", 262, 16.0, 24, 6.0),
   createData("Cupcake", 305, 3.7, 67, 4.3),
   createData("Gingerbread", 356, 16.0, 49, 3.9),
+  // Add More Data dummy random key value Here
 ];
+
+function generateRandomKey(length: number) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let key = '';
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    key += characters.charAt(randomIndex);
+  }
+  return key;
+}
+
+const numberOfEntries = 7; // Number of data entries to add
+const keyLength = 12; // Length of the generated random key
+
+for (let i = 0; i < numberOfEntries; i++) {
+  const randomKey = generateRandomKey(keyLength);
+  const randomValue1 = Math.floor(Math.random() * 1000);
+  const randomValue2 = Math.floor(Math.random() * 100);
+  const randomValue3 = Math.floor(Math.random() * 100);
+  const randomValue4 = Math.floor(Math.random() * 15);
+
+  const newData = createData(randomKey, randomValue1, randomValue2, randomValue3, randomValue4);
+  initialRows.push(newData);
+}
+
+
 
 // Avtion Cell
 const handleAction = (action: string, row: any) => {
@@ -89,7 +117,9 @@ export const SearchFilterTable = () => {
     setSearch(e.target.value);
   };
 
-  const filteredRows = initialRows.filter((row) => row.name.includes(search));
+  const filteredRows = initialRows.filter((row) =>
+    row.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   const [sortField, setSortField] = useState<keyof RowData | "">("");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
@@ -171,31 +201,43 @@ export const SearchFilterTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {sortedRows.map((row) => (
-              <StyledTableRow key={row.name}>
-                <>
-                  <StyledTableCell component="th" scope="row">
-                    {row.name}
-                  </StyledTableCell>
-                  <StyledTableCell>{row.calories}</StyledTableCell>
-                  <StyledTableCell>{row.fat}</StyledTableCell>
-                  <StyledTableCell>{row.carbs}</StyledTableCell>
-                  <StyledTableCell>{row.protein}</StyledTableCell>
-                  <StyledTableCell align="right" width={140}>
-                    {/* Action Cell */}
-                    <IconButton onClick={() => handleAction("detail", row)}>
-                      <Visibility />
-                    </IconButton>
-                    <IconButton onClick={() => handleAction("edit", row)}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton onClick={() => handleAction("delete", row)}>
-                      <Delete />
-                    </IconButton>
-                  </StyledTableCell>
-                </>
-              </StyledTableRow>
-            ))}
+            {sortedRows.length > 0 ? (
+              sortedRows.map((row) => (
+                <StyledTableRow key={row.name}>
+                  {" "}
+                  <>
+                    <StyledTableCell component="th" scope="row">
+                      {row.name}
+                    </StyledTableCell>
+                    <StyledTableCell>{row.calories}</StyledTableCell>
+                    <StyledTableCell>{row.fat}</StyledTableCell>
+                    <StyledTableCell>{row.carbs}</StyledTableCell>
+                    <StyledTableCell>{row.protein}</StyledTableCell>
+                    <StyledTableCell align="right" width={140}>
+                      {/* Action Cell */}
+                      <IconButton onClick={() => handleAction("detail", row)}>
+                        <Visibility />
+                      </IconButton>
+                      <IconButton onClick={() => handleAction("edit", row)}>
+                        <Edit />
+                      </IconButton>
+                      <IconButton onClick={() => handleAction("delete", row)}>
+                        <Delete />
+                      </IconButton>
+                    </StyledTableCell>
+                  </>
+                </StyledTableRow>
+              ))
+            ) : (
+              <StyledTableCell
+                component="th"
+                scope="row"
+                colSpan={5}
+                sx={{ textAlign: "center" }}
+              >
+                <Typography variant="h5">No results found.</Typography>
+              </StyledTableCell>
+            )}
           </TableBody>
         </Table>
       </TableContainer>
