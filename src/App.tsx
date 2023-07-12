@@ -7,7 +7,7 @@ import "./App.css";
 function App() {
   return (
     <>
-      <Container>
+      <Container sx={{ p: 2, pb: 10 }}>
         <Typography variant="h1">Filter Table</Typography>
 
         <Typography variant="h2">SearchFilterTable</Typography>

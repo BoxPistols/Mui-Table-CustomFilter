@@ -7,10 +7,17 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Box, FormControl, FormLabel, TextField } from "@mui/material";
+import {
+  Box,
+  FormControl,
+  FormLabel,
+  IconButton,
+  TextField,
+} from "@mui/material";
 import { useState } from "react";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import { Delete, Edit, Visibility } from "@mui/icons-material";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -57,6 +64,23 @@ const initialRows = [
   createData("Cupcake", 305, 3.7, 67, 4.3),
   createData("Gingerbread", 356, 16.0, 49, 3.9),
 ];
+
+// Avtion Cell
+const handleAction = (action: string, row: any) => {
+  switch (action) {
+    case "detail":
+      alert(`詳細表示: (row.name)}`);
+      break;
+    case "edit":
+      alert(`編集: (row)}`);
+      break;
+    case "delete":
+      alert(`削除: (row)}`);
+      break;
+    default:
+      break;
+  }
+};
 
 export const SearchFilterTable = () => {
   const [search, setSearch] = useState<string>("");
@@ -115,50 +139,61 @@ export const SearchFilterTable = () => {
       </FormControl>
 
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 700 }} aria-label="customized table">
+        <Table
+          sx={{ minWidth: 700, minHeight: 300 }}
+          aria-label="customized table"
+        >
           <TableHead>
             <TableRow>
               <StyledTableCell onClick={() => handleSort("name")}>
                 Dessert (100g serving)
                 {sortField === "name" && SortIcon}
               </StyledTableCell>
-              <StyledTableCell
-                align="right"
-                onClick={() => handleSort("calories")}
-              >
+              <StyledTableCell onClick={() => handleSort("calories")}>
                 Calories
                 {sortField === "calories" && SortIcon}
               </StyledTableCell>
-              <StyledTableCell align="right" onClick={() => handleSort("fat")}>
+              <StyledTableCell onClick={() => handleSort("fat")}>
                 Fat&nbsp;(g)
                 {sortField === "fat" && SortIcon}
               </StyledTableCell>
-              <StyledTableCell
-                align="right"
-                onClick={() => handleSort("carbs")}
-              >
+              <StyledTableCell onClick={() => handleSort("carbs")}>
                 Carbs&nbsp;(g)
                 {sortField === "carbs" && SortIcon}
               </StyledTableCell>
-              <StyledTableCell
-                align="right"
-                onClick={() => handleSort("protein")}
-              >
+              <StyledTableCell onClick={() => handleSort("protein")}>
                 Protein&nbsp;(g)
                 {sortField === "protein" && SortIcon}
+              </StyledTableCell>
+              <StyledTableCell align="center" width={140}>
+                Action
               </StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {sortedRows.map((row) => (
               <StyledTableRow key={row.name}>
-                <StyledTableCell component="th" scope="row">
-                  {row.name}
-                </StyledTableCell>
-                <StyledTableCell align="right">{row.calories}</StyledTableCell>
-                <StyledTableCell align="right">{row.fat}</StyledTableCell>
-                <StyledTableCell align="right">{row.carbs}</StyledTableCell>
-                <StyledTableCell align="right">{row.protein}</StyledTableCell>
+                <>
+                  <StyledTableCell component="th" scope="row">
+                    {row.name}
+                  </StyledTableCell>
+                  <StyledTableCell>{row.calories}</StyledTableCell>
+                  <StyledTableCell>{row.fat}</StyledTableCell>
+                  <StyledTableCell>{row.carbs}</StyledTableCell>
+                  <StyledTableCell>{row.protein}</StyledTableCell>
+                  <StyledTableCell align="right" width={140}>
+                    {/* Action Cell */}
+                    <IconButton onClick={() => handleAction("detail", row)}>
+                      <Visibility />
+                    </IconButton>
+                    <IconButton onClick={() => handleAction("edit", row)}>
+                      <Edit />
+                    </IconButton>
+                    <IconButton onClick={() => handleAction("delete", row)}>
+                      <Delete />
+                    </IconButton>
+                  </StyledTableCell>
+                </>
               </StyledTableRow>
             ))}
           </TableBody>

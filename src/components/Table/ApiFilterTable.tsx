@@ -67,7 +67,9 @@ export const ApiFilterTable = () => {
     setSearch(e.target.value);
   };
 
-  const filteredRows = rows.filter((row) => row.title.includes(search));
+  const filteredRows = rows.filter((row) =>
+    row.title.toLowerCase().includes(search.toLowerCase())
+  );
 
   const [sortField, setSortField] = useState<keyof Product | null>(null); // Defined sortField as keyof Product
   const [sortDirection, setSortDirection] = useState("asc");
@@ -98,6 +100,7 @@ export const ApiFilterTable = () => {
 
   // Pagination states
   const [page, setPage] = useState(1);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const handlePageChange = (
@@ -133,7 +136,10 @@ export const ApiFilterTable = () => {
       </FormControl>
 
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 700 }} aria-label="customized table">
+        <Table
+          sx={{ minWidth: 700, minHeight: 300 }}
+          aria-label="customized table"
+        >
           <TableHead>
             <TableRow>
               <StyledTableCell onClick={() => handleSort("title")}>
@@ -168,7 +174,27 @@ export const ApiFilterTable = () => {
           </TableBody>{" "}
         </Table>
       </TableContainer>
-      <Pagination count={pageCount} page={page} onChange={handlePageChange} />
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginTop: 2,
+        }}
+      >
+        <div>
+          <Pagination
+            count={pageCount}
+            page={page}
+            onChange={handlePageChange}
+          />
+        </div>
+        <div>
+          <span>Total records: {sortedRows.length} | </span>
+          <span>Total pages: {pageCount} | </span>
+          <span>Current page: {page}</span>
+        </div>
+      </Box>
     </>
   );
 };
