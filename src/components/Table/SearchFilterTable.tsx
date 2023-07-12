@@ -1,28 +1,22 @@
-import * as React from 'react';
-import { styled } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import {
-  Box,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  TextField,
-} from '@mui/material';
-import { useState } from 'react';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import * as React from "react";
+import { styled } from "@mui/material/styles";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import { Box, FormControl, FormLabel, TextField } from "@mui/material";
+import { useState } from "react";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
     color: theme.palette.common.white,
-    cursor: 'pointer', // Add cursor pointer
+    cursor: "pointer",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
@@ -30,14 +24,21 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(odd)': {
+  "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
   },
-  // hide last border
-  '&:last-child td, &:last-child th': {
+  "&:last-child td, &:last-child th": {
     border: 0,
   },
 }));
+
+type RowData = {
+  name: string;
+  calories: number;
+  fat: number;
+  carbs: number;
+  protein: number;
+};
 
 function createData(
   name: string,
@@ -45,55 +46,54 @@ function createData(
   fat: number,
   carbs: number,
   protein: number
-) {
+): RowData {
   return { name, calories, fat, carbs, protein };
 }
 
 const initialRows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
+  createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
+  createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
+  createData("Eclair", 262, 16.0, 24, 6.0),
+  createData("Cupcake", 305, 3.7, 67, 4.3),
+  createData("Gingerbread", 356, 16.0, 49, 3.9),
 ];
 
-export default function CustomizedTables() {
-  // ======= 検索フィルター
-  const [search, setSearch] = useState('');
+export const SearchFilterTable = () => {
+  const [search, setSearch] = useState<string>("");
 
-  const handleSearchChange = (e: {
-    target: { value: React.SetStateAction<string> };
-  }) => {
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
 
   const filteredRows = initialRows.filter((row) => row.name.includes(search));
 
-  // ======= Sortフィルター
-  const [sortField, setSortField] = useState(null);
-  const [sortDirection, setSortDirection] = useState('asc');
+  const [sortField, setSortField] = useState<keyof RowData | "">("");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  const handleSort = (field: string | React.SetStateAction<null>) => {
-    let direction = 'asc';
-    if (sortField === field && sortDirection === 'asc') {
-      direction = 'desc';
+  const handleSort = (field: keyof RowData) => {
+    let direction: "asc" | "desc" = "asc";
+    if (sortField === field && sortDirection === "asc") {
+      direction = "desc";
     }
     setSortField(field);
     setSortDirection(direction);
   };
 
   const sortedRows = [...filteredRows].sort((a, b) => {
+    if (sortField === "") {
+      return 0;
+    }
     if (a[sortField] < b[sortField]) {
-      return sortDirection === 'asc' ? -1 : 1;
+      return sortDirection === "asc" ? -1 : 1;
     }
     if (a[sortField] > b[sortField]) {
-      return sortDirection === 'asc' ? 1 : -1;
+      return sortDirection === "asc" ? 1 : -1;
     }
     return 0;
   });
 
   const SortIcon =
-    sortDirection === 'asc' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />;
+    sortDirection === "asc" ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />;
 
   return (
     <div>
@@ -108,7 +108,7 @@ export default function CustomizedTables() {
             size="small"
             sx={{ marginBottom: 2 }}
           />
-          <FormLabel htmlFor="aaa" sx={{ position: 'relative', marginLeft: 1 }}>
+          <FormLabel htmlFor="aaa" sx={{ position: "relative", marginLeft: 1 }}>
             テーブル検索
           </FormLabel>
         </Box>
@@ -118,34 +118,34 @@ export default function CustomizedTables() {
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
           <TableHead>
             <TableRow>
-              <StyledTableCell onClick={() => handleSort('name')}>
+              <StyledTableCell onClick={() => handleSort("name")}>
                 Dessert (100g serving)
-                {sortField === 'name' && SortIcon}
+                {sortField === "name" && SortIcon}
               </StyledTableCell>
               <StyledTableCell
                 align="right"
-                onClick={() => handleSort('calories')}
+                onClick={() => handleSort("calories")}
               >
                 Calories
-                {sortField === 'calories' && SortIcon}
+                {sortField === "calories" && SortIcon}
               </StyledTableCell>
-              <StyledTableCell align="right" onClick={() => handleSort('fat')}>
+              <StyledTableCell align="right" onClick={() => handleSort("fat")}>
                 Fat&nbsp;(g)
-                {sortField === 'fat' && SortIcon}
+                {sortField === "fat" && SortIcon}
               </StyledTableCell>
               <StyledTableCell
                 align="right"
-                onClick={() => handleSort('carbs')}
+                onClick={() => handleSort("carbs")}
               >
                 Carbs&nbsp;(g)
-                {sortField === 'carbs' && SortIcon}
+                {sortField === "carbs" && SortIcon}
               </StyledTableCell>
               <StyledTableCell
                 align="right"
-                onClick={() => handleSort('protein')}
+                onClick={() => handleSort("protein")}
               >
                 Protein&nbsp;(g)
-                {sortField === 'protein' && SortIcon}
+                {sortField === "protein" && SortIcon}
               </StyledTableCell>
             </TableRow>
           </TableHead>
@@ -166,4 +166,4 @@ export default function CustomizedTables() {
       </TableContainer>
     </div>
   );
-}
+};
