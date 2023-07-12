@@ -19,7 +19,7 @@ import {
 import { useState, useEffect } from "react";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import { Visibility, Edit, Delete } from "@mui/icons-material";
+import { Visibility, Edit, Delete, Clear } from "@mui/icons-material";
 
 // API data type
 type Product = {
@@ -37,14 +37,17 @@ type Product = {
 };
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  maxHeight: "2.5em",
   padding: "0.75em 1.25em",
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
     color: theme.palette.common.white,
     cursor: "pointer",
     fontWeight: 700,
-    fontSize: 16,
     paddingLeft: "1.5em",
+    position: "relative",
+    fontSize: 15,
+    whiteSpace: "nowrap"
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
@@ -65,16 +68,18 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 const handleAction = (action: string, row: Product) => {
   switch (action) {
     case "detail":
-      alert(`Details: ${JSON.stringify(row)}`);
+      alert(`${row.title} の詳細です \n ${JSON.stringify(row)}`);
       break;
     case "edit":
       // TODO: Implement edit action.
-      alert(`Edit URL for product ${row.id} would be opened.`);
+      alert(`${row.title} を開き編集します \n 編集ページ \n ${row.id}`);
       break;
     case "delete":
-      if (window.confirm(`Are you sure you want to delete ${row.title}?`)) {
+      if (window.confirm(`${row.title} を消去してもよろしいですか?`)) {
         // TODO: Implement delete action.
-        alert(`Product ${row.id} would be deleted.`);
+        alert(`${row.title} を消去しました`);
+      } else {
+        alert(`${row.title} を消去しませんでした`);
       }
       break;
     default:
@@ -84,6 +89,8 @@ const handleAction = (action: string, row: Product) => {
 
 export const ApiFilterTable = () => {
   const [search, setSearch] = useState("");
+  const isSearchEmpty = search === "";
+
   const [rows, setRows] = useState<Product[]>([]); // Defined rows as Product array
 
   useEffect(() => {
@@ -94,6 +101,10 @@ export const ApiFilterTable = () => {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
+  };
+
+  const handleClearSearch = () => {
+    setSearch("");
   };
 
   const filteredRows = rows.filter((row) =>
@@ -125,7 +136,7 @@ export const ApiFilterTable = () => {
   });
 
   const SortIcon =
-    sortDirection === "asc" ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />;
+    sortDirection === "asc" ? <ArrowUpwardIcon sx={{ fontSize: 16, position: "absolute", top: "1em", padding: "0 2px" }} /> : <ArrowDownwardIcon sx={{ fontSize: 16, position: "absolute", top: "1em", padding: "0 2px" }} />;
 
   // Pagination states
   const [page, setPage] = useState(1);
@@ -133,7 +144,7 @@ export const ApiFilterTable = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const handlePageChange = (
-    event: React.ChangeEvent<unknown>,
+    _event: React.ChangeEvent<unknown>,
     value: number
   ) => {
     setPage(value);
@@ -148,19 +159,28 @@ export const ApiFilterTable = () => {
   return (
     <>
       <FormControl>
-        <Box display="flex" alignItems="baseline">
+        <Box display="flex" flexDirection="column">
+          <FormLabel htmlFor="search-input" sx={{ position: "relative", marginBottom: -2, fontSize: 12 }}>
+            テーブル検索
+          </FormLabel>
           <TextField
-            id="aaa"
+            id="search-input"
             value={search}
             onChange={handleSearchChange}
             variant="outlined"
             margin="normal"
             size="small"
-            sx={{ marginBottom: 2 }}
+            sx={{
+              position: "relative",
+              marginBottom: 2,
+              paddingRight: "2em"
+            }}
           />
-          <FormLabel htmlFor="aaa" sx={{ position: "relative", marginLeft: 1 }}>
-            テーブル検索
-          </FormLabel>
+          {!isSearchEmpty && (
+            <IconButton onClick={handleClearSearch} sx={{ position: "absolute", top: "0.85em", right: 30, }}>
+              <Clear sx={{ fontSize: 18 }} />
+            </IconButton>
+          )}
         </Box>
       </FormControl>
 
@@ -202,7 +222,7 @@ export const ApiFilterTable = () => {
                   <StyledTableCell>{row.price}</StyledTableCell>
                   <StyledTableCell>{row.stock}</StyledTableCell>
                   <StyledTableCell>{row.rating}</StyledTableCell>
-                  <StyledTableCell align="right">
+                  <StyledTableCell align="right" width={140} sx={{ whiteSpace: "nowrap" }}>
                     <IconButton onClick={() => handleAction("detail", row)}>
                       <Visibility />
                     </IconButton>
@@ -235,21 +255,19 @@ export const ApiFilterTable = () => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginTop: 2,
+          marginTop: 1,
         }}
       >
-        <div>
-          <Pagination
-            count={pageCount}
-            page={page}
-            onChange={handlePageChange}
-          />
-        </div>
-        <div>
-          <span>Total records: {sortedRows.length} | </span>
-          <span>Total pages: {pageCount} | </span>
-          <span>Current page: {page}</span>
-        </div>
+        <Typography>
+          <Typography component="span" variant="caption">Total records: {sortedRows.length} / </Typography>
+          <Typography component="span" variant="caption">Total pages: {pageCount} / </Typography>
+          <Typography component="span" variant="caption">Current page: {page}</Typography>
+        </Typography>
+        <Pagination
+          count={pageCount}
+          page={page}
+          onChange={handlePageChange}
+        />
       </Box>
     </>
   );

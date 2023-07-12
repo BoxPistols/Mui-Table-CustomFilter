@@ -18,16 +18,25 @@ import {
 import { useState } from "react";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import { Delete, Edit, Visibility } from "@mui/icons-material";
+import { Delete, Edit, Visibility, Clear } from "@mui/icons-material";
 
+                  
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  maxHeight: "2.5em",
+  padding: "0.75em 1.25em",
   [`&.${tableCellClasses.head}`]: {
+    fontWeight: 700,
     backgroundColor: theme.palette.common.black,
     color: theme.palette.common.white,
     cursor: "pointer",
+    paddingLeft: "1.5em",
+    position: "relative",
+    fontSize: 15,
+    whiteSpace: "nowrap"
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
+    paddingLeft: "1.75em",
   },
 }));
 
@@ -36,7 +45,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     backgroundColor: theme.palette.action.hover,
   },
   "&:last-child td, &:last-child th": {
-    border: 0,
+    border: 0,          
   },
 }));
 
@@ -67,6 +76,7 @@ const initialRows = [
   // Add More Data dummy random key value Here
 ];
 
+// Dummy random key generator
 function generateRandomKey(length: number) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let key = '';
@@ -77,8 +87,8 @@ function generateRandomKey(length: number) {
   return key;
 }
 
-const numberOfEntries = 7; // Number of data entries to add
-const keyLength = 12; // Length of the generated random key
+const numberOfEntries = 3; // Number of data entries to add
+const keyLength = 10; // Length of the generated random key
 
 for (let i = 0; i < numberOfEntries; i++) {
   const randomKey = generateRandomKey(keyLength);
@@ -91,19 +101,21 @@ for (let i = 0; i < numberOfEntries; i++) {
   initialRows.push(newData);
 }
 
-
-
 // Avtion Cell
 const handleAction = (action: string, row: any) => {
   switch (action) {
     case "detail":
-      alert(`詳細表示: (row.name)}`);
+      alert(`${row.name} の詳細です \n ${JSON.stringify(row)}`);
       break;
     case "edit":
-      alert(`編集: (row)}`);
+      alert(`編集: ${row.name} の編集ページに移動`);
       break;
     case "delete":
-      alert(`削除: (row)}`);
+      if (window.confirm(`${row.name} を消去してもよろしいですか?`)) {
+        alert(`${row.name} を消去しました`);
+      } else {
+        alert(`${row.name} を消去しませんでした`);
+      }
       break;
     default:
       break;
@@ -112,10 +124,16 @@ const handleAction = (action: string, row: any) => {
 
 export const SearchFilterTable = () => {
   const [search, setSearch] = useState<string>("");
+  const isSearchEmpty = search === "";
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
+
+  const handleClearSearch = () => {
+    setSearch("");
+  };
+
 
   const filteredRows = initialRows.filter((row) =>
     row.name.toLowerCase().includes(search.toLowerCase())
@@ -147,24 +165,33 @@ export const SearchFilterTable = () => {
   });
 
   const SortIcon =
-    sortDirection === "asc" ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />;
+    sortDirection === "asc" ? <ArrowUpwardIcon sx={{ fontSize: 16, position: "absolute", top: "1.25em", padding: "0 2px" }} /> : <ArrowDownwardIcon sx={{ fontSize: 16, position: "absolute", top: "1.25em", padding: "0 2px" }} />;
 
   return (
-    <div>
+    <>
       <FormControl>
-        <Box display="flex" alignItems="baseline">
+        <Box display="flex" flexDirection="column">
+          <FormLabel htmlFor="search-input" sx={{ position: "relative", marginBottom: -2, fontSize: 12 }}>
+            テーブル検索
+          </FormLabel>
           <TextField
-            id="aaa"
+            id="search-input"
             value={search}
             onChange={handleSearchChange}
             variant="outlined"
             margin="normal"
             size="small"
-            sx={{ marginBottom: 2 }}
+            sx={{
+              position: "relative",
+              marginBottom: 2,
+              paddingRight: "2em"
+            }}
           />
-          <FormLabel htmlFor="aaa" sx={{ position: "relative", marginLeft: 1 }}>
-            テーブル検索
-          </FormLabel>
+          {!isSearchEmpty && (
+            <IconButton onClick={handleClearSearch} sx={{ position: "absolute", top: "0.85em", right: 30, }}>
+              <Clear sx={{ fontSize: 18 }} />
+            </IconButton>
+          )}
         </Box>
       </FormControl>
 
@@ -213,7 +240,7 @@ export const SearchFilterTable = () => {
                     <StyledTableCell>{row.fat}</StyledTableCell>
                     <StyledTableCell>{row.carbs}</StyledTableCell>
                     <StyledTableCell>{row.protein}</StyledTableCell>
-                    <StyledTableCell align="right" width={140}>
+                    <StyledTableCell align="right" width={140} sx={{whiteSpace: "nowrap"}}>
                       {/* Action Cell */}
                       <IconButton onClick={() => handleAction("detail", row)}>
                         <Visibility />
@@ -241,6 +268,6 @@ export const SearchFilterTable = () => {
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </>
   );
 };
