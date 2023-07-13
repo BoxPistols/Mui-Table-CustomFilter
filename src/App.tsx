@@ -10,13 +10,13 @@ function App() {
       <Container sx={{ p: 2, pb: 10 }}>
         <Typography variant="h1">Filter Table</Typography>
 
-        <Typography variant="h2">SearchFilterTable</Typography>
-        <SearchFilterTable />
+        <Typography variant="h2">ApiFilterTable</Typography>
+        <ApiFilterTable />
 
         <Divider sx={{ my: 4 }} />
 
-        <Typography variant="h2">ApiFilterTable</Typography>
-        <ApiFilterTable />
+        <Typography variant="h2">SearchFilterTable</Typography>
+        <SearchFilterTable />
       </Container>
     </>
   );
