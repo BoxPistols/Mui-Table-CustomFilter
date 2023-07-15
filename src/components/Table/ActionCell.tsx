@@ -1,4 +1,4 @@
-import { FC } from "react"
+// ActionCell.tsx
 import { IconButton } from "@mui/material"
 import { Delete, Edit, Visibility } from "@mui/icons-material"
 
@@ -12,19 +12,40 @@ type RowData = {
 
 type ActionCellProps = {
   row: RowData
-  handleAction: (action: string, row: RowData) => void
 }
 
-export const ActionCell: FC<ActionCellProps> = ({ row, handleAction }) => (
-  <div>
-    <IconButton onClick={() => handleAction("detail", row)}>
-      <Visibility />
-    </IconButton>
-    <IconButton onClick={() => handleAction("edit", row)}>
-      <Edit />
-    </IconButton>
-    <IconButton onClick={() => handleAction("delete", row)}>
-      <Delete />
-    </IconButton>
-  </div>
-)
+export const ActionCell = ({ row }: ActionCellProps) => {
+  const handleAction = (action: string) => {
+    switch (action) {
+      case "detail":
+        alert(`${row.name} の詳細です \n ${JSON.stringify(row)}`)
+        break
+      case "edit":
+        alert(`編集: ${row.name} の編集ページに移動`)
+        break
+      case "delete":
+        if (window.confirm(`${row.name} を消去してもよろしいですか?`)) {
+          alert(`${row.name} を消去しました`)
+        } else {
+          alert(`${row.name} を消去しませんでした`)
+        }
+        break
+      default:
+        break
+    }
+  }
+
+  return (
+    <>
+      <IconButton onClick={() => handleAction("detail")}>
+        <Visibility />
+      </IconButton>
+      <IconButton onClick={() => handleAction("edit")}>
+        <Edit />
+      </IconButton>
+      <IconButton onClick={() => handleAction("delete")}>
+        <Delete />
+      </IconButton>
+    </>
+  )
+}
