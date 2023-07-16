@@ -1,5 +1,6 @@
 // src/components/Table/ApiFilterTable.tsx
 import * as React from 'react'
+import { useState, useEffect } from 'react'
 import {
   Table,
   TableBody,
@@ -11,15 +12,17 @@ import {
   Pagination,
   Typography,
 } from '@mui/material'
-import { useState, useEffect } from 'react'
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
-
+// Table components
 import { StyledTableCell } from './StyledTableCell'
 import { StyledTableRow } from './StyledTableRow'
+// Contained components
 import { SearchInput } from './SearchInput'
 import { ActionCell } from './ActionCell'
 import { useSort } from './useSort' // useSort hook is imported
+import { usePagination } from './usePagination'
+// Icons
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 
 // API data type
 type Product = {
@@ -73,14 +76,6 @@ export const ApiFilterTable = () => {
       .then((data) => setRows(data.products))
   }, [])
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value)
-  }
-
-  const handleClearSearch = () => {
-    setSearch('')
-  }
-
   const SortIcon =
     sortDirection === 'asc' ? (
       <ArrowUpwardIcon
@@ -103,15 +98,20 @@ export const ApiFilterTable = () => {
     )
 
   // Pagination states
-  const [page, setPage] = useState(1)
-  const [itemsPerPage] = useState(10)
+  // const [page, setPage] = useState(1)
+  // const [itemsPerPage] = useState(10)
 
-  const handlePageChange = (
-    _event: React.ChangeEvent<unknown>,
-    value: number,
-  ) => {
-    setPage(value)
-  }
+  // const handlePageChange = (
+  //   _event: React.ChangeEvent<unknown>,
+  //   value: number,
+  // ) => {
+  //   setPage(value)
+  // }
+
+  const { page, itemsPerPage, handlePageChange } = usePagination({
+    page: 1,
+    itemsPerPage: 10,
+  })
 
   const pageCount = Math.ceil(filteredAndSortedRows.length / itemsPerPage)
   const paginatedRows = filteredAndSortedRows.slice(
@@ -119,11 +119,22 @@ export const ApiFilterTable = () => {
     page * itemsPerPage,
   )
 
+  // Filter and sort rows
   useEffect(() => {
     setFilteredAndSortedRows(
       sortedRows.filter((row) => multiFieldSearch(row, search)),
     )
   }, [sortedRows, search, page])
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value)
+    // これは検索ボックスに入力されたときに内部的にページを1に戻すための処理です
+    // setPage(1)
+  }
+
+  const handleClearSearch = () => {
+    setSearch('')
+  }
 
   return (
     <>
@@ -196,6 +207,7 @@ export const ApiFilterTable = () => {
           </TableBody>{' '}
         </Table>
       </TableContainer>
+
       <Box
         sx={{
           display: 'flex',
