@@ -30,6 +30,7 @@ import { usePagination } from './usePagination'
 import { SortIcon } from './SortIcon'
 import ToggleOnOutlinedIcon from '@mui/icons-material/ToggleOnOutlined'
 import { PagenateDesign } from './PagenateDesign'
+import { ColumnSelector } from './ColumnSelector'
 
 // API data type
 type Product = {
@@ -156,14 +157,6 @@ export const ApiFilterTable = () => {
   // Toggle columns
   const [hiddenColumns, setHiddenColumns] = useState<string[]>([])
 
-  const [anchorEl, setAnchorEl] = useState<
-    (EventTarget & HTMLButtonElement) | null
-  >(null)
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
-
   const toggleColumnVisibility = (field: string) => {
     if (hiddenColumns.includes(field)) {
       setHiddenColumns(hiddenColumns.filter((column) => column !== field))
@@ -171,16 +164,13 @@ export const ApiFilterTable = () => {
       setHiddenColumns([...hiddenColumns, field])
     }
   }
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
 
-  const handleShowAll = () => {
-    setHiddenColumns([])
-  }
-
-  const handleHideAllColumns = () => {
+  const hideAllColumns = () => {
     setHiddenColumns(columns.map((column) => column.key))
+  }
+
+  const showAllColumns = () => {
+    setHiddenColumns([])
   }
 
   return (
@@ -194,47 +184,15 @@ export const ApiFilterTable = () => {
       />
       <Box>
         <Box display="flex" justifyContent="flex-end" sx={{ pr: 1 }}>
-          <IconButton onClick={handleClick}>
-            <ToggleOnOutlinedIcon sx={{ fontSize: 38 }} color="primary" />
-          </IconButton>
+          <ColumnSelector
+            columns={columns}
+            hiddenColumns={hiddenColumns}
+            toggleColumnVisibility={toggleColumnVisibility}
+            hideAllColumns={hideAllColumns}
+            showAllColumns={showAllColumns}
+          />
         </Box>
       </Box>
-
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-        {columns.map((column) => (
-          <MenuItem key={column.key} sx={{ minWidth: 180, pl: 3, pt: 0 }}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={!hiddenColumns.includes(column.key)}
-                  onChange={() => toggleColumnVisibility(column.key)}
-                  size="small"
-                />
-              }
-              label={column.label}
-            />
-          </MenuItem>
-        ))}
-        <Box display="flex">
-          <MenuItem>
-            <Button variant="text" onClick={handleHideAllColumns} size="small">
-              全て非表示
-            </Button>
-          </MenuItem>
-          <MenuItem>
-            <Button variant="text" onClick={handleShowAll} size="small">
-              全て表示
-            </Button>
-          </MenuItem>
-        </Box>
-        <Box display="flex" justifyContent="center">
-          <MenuItem>
-            <Button variant="outlined" onClick={handleClose} size="small">
-              閉じる
-            </Button>
-          </MenuItem>
-        </Box>
-      </Menu>
 
       <TableContainer component={Paper}>
         <Table
