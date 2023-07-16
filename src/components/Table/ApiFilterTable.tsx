@@ -1,6 +1,7 @@
 // src/components/Table/ApiFilterTable.tsx
 import * as React from 'react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+
 import {
   Table,
   TableBody,
@@ -16,13 +17,14 @@ import {
 import { StyledTableCell } from './StyledTableCell'
 import { StyledTableRow } from './StyledTableRow'
 // Contained components
-import { SearchInput } from './SearchInput'
+import SearchInput from './SearchInput'
 import { ActionCell } from './ActionCell'
 import { useSort } from './useSort' // useSort hook is imported
 import { usePagination } from './usePagination'
 // Icons
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
+// import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
+// import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
+import { SortIcon } from './SortIcon'
 
 // API data type
 type Product = {
@@ -59,6 +61,7 @@ const multiFieldSearch = (row: Product, query: string) => {
 
 export const ApiFilterTable = () => {
   const [search, setSearch] = useState('')
+  const searchInputRef = useRef<HTMLInputElement | null>(null)
   const isSearchEmpty = search === ''
   const [filteredAndSortedRows, setFilteredAndSortedRows] = useState<Product[]>(
     [],
@@ -76,48 +79,47 @@ export const ApiFilterTable = () => {
       .then((data) => setRows(data.products))
   }, [])
 
-  const SortIcon =
-    sortDirection === 'asc' ? (
-      <ArrowUpwardIcon
-        sx={{
-          fontSize: 20,
-          position: 'absolute',
-          top: '0.75em',
-          padding: '0 2px',
-        }}
-      />
-    ) : (
-      <ArrowDownwardIcon
-        sx={{
-          fontSize: 20,
-          position: 'absolute',
-          top: '0.75em',
-          padding: '0 2px',
-        }}
-      />
-    )
-
   // Pagination states
-  // const [page, setPage] = useState(1)
-  // const [itemsPerPage] = useState(10)
-
-  // const handlePageChange = (
-  //   _event: React.ChangeEvent<unknown>,
-  //   value: number,
-  // ) => {
-  //   setPage(value)
-  // }
-
   const { page, itemsPerPage, handlePageChange } = usePagination({
     page: 1,
     itemsPerPage: 10,
   })
-
+  // page: 1, itemsPerPage: 10 という初期値を設定しています
   const pageCount = Math.ceil(filteredAndSortedRows.length / itemsPerPage)
   const paginatedRows = filteredAndSortedRows.slice(
     (page - 1) * itemsPerPage,
     page * itemsPerPage,
   )
+
+  // Search input handler
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value),
+      setFilteredAndSortedRows(
+        sortedRows.filter((row) => multiFieldSearch(row, search)),
+      )
+  } // Added setFilteredAndSortedRows
+
+  // Clear search input
+  function handleClearSearch(): void {
+    setSearch('')
+  }
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const keydownHandler = (event: KeyboardEvent) => {
+      // ESCキーで検索をクリア
+      if (event.key === 'Escape') {
+        handleClearSearch()
+      }
+      // Cmd + / or Ctrl + / で検索フィールドにフォーカス
+      if ((event.metaKey || event.ctrlKey) && event.key === '/') {
+        searchInputRef.current?.focus()
+      }
+    }
+    window.addEventListener('keydown', keydownHandler)
+    // Clean up the event listener when the component is unmounted
+    return () => window.removeEventListener('keydown', keydownHandler)
+  }, [])
 
   // Filter and sort rows
   useEffect(() => {
@@ -126,19 +128,18 @@ export const ApiFilterTable = () => {
     )
   }, [sortedRows, search, page])
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value)
-    // これは検索ボックスに入力されたときに内部的にページを1に戻すための処理です
-    // setPage(1)
-  }
-
-  const handleClearSearch = () => {
-    setSearch('')
-  }
+  // Table columns
+  const columns = [
+    { label: 'Title', key: 'title' },
+    { label: 'Price', key: 'price' },
+    { label: 'Stock', key: 'stock' },
+    { label: 'Rating', key: 'rating' },
+  ]
 
   return (
     <>
       <SearchInput
+        ref={searchInputRef}
         search={search}
         handleSearchChange={handleSearchChange}
         handleClearSearch={handleClearSearch}
@@ -152,22 +153,12 @@ export const ApiFilterTable = () => {
         >
           <TableHead>
             <TableRow>
-              <StyledTableCell onClick={() => handleSort('title')}>
-                Title
-                {sortField === 'title' && SortIcon}
-              </StyledTableCell>
-              <StyledTableCell onClick={() => handleSort('price')}>
-                Price
-                {sortField === 'price' && SortIcon}
-              </StyledTableCell>
-              <StyledTableCell onClick={() => handleSort('stock')}>
-                Stock
-                {sortField === 'stock' && SortIcon}
-              </StyledTableCell>
-              <StyledTableCell onClick={() => handleSort('rating')}>
-                Rating
-                {sortField === 'rating' && SortIcon}
-              </StyledTableCell>
+              {columns.map(({ label, key }) => (
+                <StyledTableCell key={key} onClick={() => handleSort(key)}>
+                  {label}
+                  {sortField === key && <SortIcon direction={sortDirection} />}
+                </StyledTableCell>
+              ))}
               <StyledTableCell align="center" width={140}>
                 Action
               </StyledTableCell>
@@ -177,12 +168,17 @@ export const ApiFilterTable = () => {
             {paginatedRows.length > 0 ? (
               paginatedRows.map((row) => (
                 <StyledTableRow key={row.id}>
-                  <StyledTableCell component="th" scope="row">
-                    {row.title}
-                  </StyledTableCell>
-                  <StyledTableCell>{row.price}</StyledTableCell>
-                  <StyledTableCell>{row.stock}</StyledTableCell>
-                  <StyledTableCell>{row.rating}</StyledTableCell>
+                  {columns.map(({ key }) => (
+                    <StyledTableCell
+                      key={key}
+                      component="th"
+                      scope="row"
+                      sx={{ whiteSpace: 'nowrap' }}
+                    >
+                      {row[key as keyof Product]}
+                    </StyledTableCell>
+                  ))}
+
                   <StyledTableCell
                     align="right"
                     width={140}
@@ -204,7 +200,7 @@ export const ApiFilterTable = () => {
                 </StyledTableCell>
               </StyledTableRow>
             )}
-          </TableBody>{' '}
+          </TableBody>
         </Table>
       </TableContainer>
 

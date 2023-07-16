@@ -14,11 +14,11 @@ function App() {
 
         <Typography variant="h2">ApiFilterTable</Typography>
         <ApiFilterTable />
-
+        {/* 
         <Divider sx={{ my: 4 }} />
 
         <Typography variant="h2">SearchFilterTable</Typography>
-        <SearchFilterTable />
+        <SearchFilterTable /> */}
       </Container>
     </>
   )

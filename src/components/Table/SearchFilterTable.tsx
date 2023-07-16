@@ -1,6 +1,6 @@
 // src/components/Table/SearchFilterTable.tsx
 import * as React from 'react'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import {
   Table,
   TableBody,
@@ -12,7 +12,7 @@ import {
 } from '@mui/material'
 import { StyledTableCell } from './StyledTableCell'
 import { StyledTableRow } from './StyledTableRow'
-import { SearchInput } from './SearchInput'
+import SearchInput from './SearchInput'
 
 import { useSort } from './useSort'
 import { ActionCell } from './ActionCell'
@@ -109,9 +109,31 @@ export const SearchFilterTable = () => {
     filteredRows,
   )
 
+  // Search input ref
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  React.useEffect(() => {
+    const keydownHandler = (event: KeyboardEvent) => {
+      // ESCキーで検索をクリア
+      if (event.key === 'Escape') {
+        handleClearSearch()
+      }
+
+      // Cmd + / or Ctrl + / で検索フィールドにフォーカス
+      if ((event.metaKey || event.ctrlKey) && event.key === '/') {
+        searchInputRef.current?.focus()
+      }
+    }
+
+    window.addEventListener('keydown', keydownHandler)
+
+    // Clean up the event listener when the component is unmounted
+    return () => window.removeEventListener('keydown', keydownHandler)
+  }, [])
   return (
     <>
       <SearchInput
+        ref={searchInputRef}
         search={search}
         handleSearchChange={handleSearchChange}
         handleClearSearch={handleClearSearch}
@@ -139,20 +161,18 @@ export const SearchFilterTable = () => {
             {sortedRows.length > 0 ? (
               sortedRows.map((row) => (
                 <StyledTableRow key={row.name}>
-                  <>
-                    {columns.map(({ key }) => (
-                      <StyledTableCell key={key} component="th" scope="row">
-                        {row[key]}
-                      </StyledTableCell>
-                    ))}
-                    <StyledTableCell
-                      align="right"
-                      width={140}
-                      sx={{ whiteSpace: 'nowrap' }}
-                    >
-                      <ActionCell row={row} />
+                  {columns.map(({ key }) => (
+                    <StyledTableCell key={key} component="th" scope="row">
+                      {row[key]}
                     </StyledTableCell>
-                  </>
+                  ))}
+                  <StyledTableCell
+                    align="right"
+                    width={140}
+                    sx={{ whiteSpace: 'nowrap' }}
+                  >
+                    <ActionCell row={row} />
+                  </StyledTableCell>
                 </StyledTableRow>
               ))
             ) : (

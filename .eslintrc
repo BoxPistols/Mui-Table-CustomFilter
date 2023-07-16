@@ -8,11 +8,11 @@
     "eslint-config-prettier"
   ],
   "rules": {
-    "react/react-in-jsx-scope": "off"
-    // その他のルールをここに記述します
+    "react/react-in-jsx-scope": "off",
+    "@typescript-eslint/no-unused-vars": "off"
   },
   "parserOptions": {
-    "ecmaVersion": 2021,
+    "ecmaVersion": 2020,
     "sourceType": "module",
     "ecmaFeatures": {
       "jsx": true

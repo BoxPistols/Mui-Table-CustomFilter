@@ -10,9 +10,6 @@ export const usePagination = (initialState: PaginationState) => {
   const [page, setPage] = useState(initialState.page)
   const [itemsPerPage, setItemsPerPage] = useState(initialState.itemsPerPage)
 
-  // const handlePageChange = (newPage: number) => {
-  //   setPage(newPage)
-  // }
   const handlePageChange = (_event: ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage)
   }

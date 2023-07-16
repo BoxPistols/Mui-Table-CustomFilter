@@ -2,15 +2,21 @@
 import { useState } from 'react'
 
 export const useSort = <T, K extends keyof T>(initialRows: T[]) => {
-  const [sortField, setSortField] = useState<K | ''>('')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
 
-  const handleSort = (field: K) => {
+  const [sortField, setSortField] = useState<K | ''>('')
+
+  const handleSort = (field: K | string) => {
     let direction: 'asc' | 'desc' = 'asc'
     if (sortField === field && sortDirection === 'asc') {
       direction = 'desc'
     }
-    setSortField(field)
+    setSortField((prevSortField: '' | K) => {
+      if (prevSortField === field) {
+        return direction === 'asc' ? '' : (field as K)
+      }
+      return field as K
+    })
     setSortDirection(direction)
   }
 

@@ -1,4 +1,4 @@
-import { FC } from 'react'
+// name: SearchFilterTable.tsx
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 
@@ -6,7 +6,7 @@ type SortIconProps = {
   direction: 'asc' | 'desc'
 }
 
-export const SortIcon: FC<SortIconProps> = ({ direction }) => {
+export const SortIcon = ({ direction }: SortIconProps) => {
   return direction === 'asc' ? (
     <ArrowUpwardIcon
       sx={{

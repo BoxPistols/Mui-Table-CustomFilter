@@ -8,5 +8,6 @@
   "notebook.formatOnSave.enabled": true,
   "prettier.semi": false,
   "typescript.format.insertSpaceAfterSemicolonInForStatements": false,
-  "autoimport.semicolon": false
+  "autoimport.semicolon": false,
+  "codemetrics.basics.CodeLensEnabled": false
 }
