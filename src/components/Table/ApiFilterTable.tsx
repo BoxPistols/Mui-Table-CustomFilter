@@ -80,10 +80,16 @@ export const ApiFilterTable = () => {
   }, [])
 
   // Pagination states
-  const { page, itemsPerPage, handlePageChange } = usePagination({
+  const {
+    page,
+    itemsPerPage,
+    handlePageChange,
+    handleDirectPageChange, // You now have access to this function
+  } = usePagination({
     page: 1,
     itemsPerPage: 10,
   })
+
   // page: 1, itemsPerPage: 10 という初期値を設定しています
   const pageCount = Math.ceil(filteredAndSortedRows.length / itemsPerPage)
   const paginatedRows = filteredAndSortedRows.slice(
@@ -91,13 +97,15 @@ export const ApiFilterTable = () => {
     page * itemsPerPage,
   )
 
-  // Search input handler
+  // Search input change handler
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value),
       setFilteredAndSortedRows(
         sortedRows.filter((row) => multiFieldSearch(row, search)),
       )
-  } // Added setFilteredAndSortedRows
+    // 強制的にページを1に戻す
+    handleDirectPageChange(1)
+  }
 
   // Clear search input
   function handleClearSearch(): void {

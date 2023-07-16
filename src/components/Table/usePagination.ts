@@ -18,10 +18,15 @@ export const usePagination = (initialState: PaginationState) => {
     setItemsPerPage(newItemsPerPage)
   }
 
+  const handleDirectPageChange = (newPage: number) => {
+    setPage(newPage)
+  }
+
   return {
     page,
     itemsPerPage,
     handlePageChange,
     handleItemsPerPageChange,
+    handleDirectPageChange, // New function is now part of the hook's returned value
   }
 }
