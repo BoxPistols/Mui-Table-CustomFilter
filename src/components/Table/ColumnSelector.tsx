@@ -71,8 +71,8 @@ export const ColumnSelector = ({
             </Button>
           </MenuItem>
           <MenuItem>
-            <Button variant="text" onClick={showAllColumns} size="small">
-              全て非表
+            <Button variant="outlined" onClick={showAllColumns} size="small">
+              全て表示
             </Button>
           </MenuItem>
         </Box>
