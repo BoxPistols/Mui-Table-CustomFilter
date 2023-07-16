@@ -19,6 +19,7 @@ import { StyledTableCell } from './StyledTableCell'
 import { StyledTableRow } from './StyledTableRow'
 import { SearchInput } from './SearchInput'
 import { ActionCell } from './ActionCell'
+import { useSort } from './useSort' // useSort hook is imported
 
 // API data type
 type Product = {
@@ -61,9 +62,10 @@ export const ApiFilterTable = () => {
   )
 
   const [rows, setRows] = useState<Product[]>([]) // Defined rows as Product array
-
-  const [sortField, setSortField] = useState<keyof Product | null>(null) // Defined sortField as keyof Product
-  const [sortDirection, setSortDirection] = useState('asc')
+  const { sortedRows, handleSort, sortField, sortDirection } = useSort<
+    Product,
+    keyof Product
+  >(rows)
 
   useEffect(() => {
     fetch('https://dummyjson.com/products')
@@ -77,16 +79,6 @@ export const ApiFilterTable = () => {
 
   const handleClearSearch = () => {
     setSearch('')
-    setPage(1)
-  }
-
-  const handleSort = (field: keyof Product) => {
-    let direction = 'asc'
-    if (sortField === field && sortDirection === 'asc') {
-      direction = 'desc'
-    }
-    setSortField(field)
-    setSortDirection(direction)
   }
 
   const SortIcon =
@@ -112,7 +104,6 @@ export const ApiFilterTable = () => {
 
   // Pagination states
   const [page, setPage] = useState(1)
-
   const [itemsPerPage] = useState(10)
 
   const handlePageChange = (
@@ -130,20 +121,9 @@ export const ApiFilterTable = () => {
 
   useEffect(() => {
     setFilteredAndSortedRows(
-      rows
-        .filter((row) => multiFieldSearch(row, search))
-        .sort((a, b) => {
-          if (sortField === null) return 0
-          if (a[sortField] < b[sortField]) {
-            return sortDirection === 'asc' ? -1 : 1
-          }
-          if (a[sortField] > b[sortField]) {
-            return sortDirection === 'asc' ? 1 : -1
-          }
-          return 0
-        }),
+      sortedRows.filter((row) => multiFieldSearch(row, search)),
     )
-  }, [rows, search, sortField, sortDirection, page]) // page added
+  }, [sortedRows, search, page])
 
   return (
     <>
@@ -174,7 +154,7 @@ export const ApiFilterTable = () => {
                 {sortField === 'stock' && SortIcon}
               </StyledTableCell>
               <StyledTableCell onClick={() => handleSort('rating')}>
-                rating
+                Rating
                 {sortField === 'rating' && SortIcon}
               </StyledTableCell>
               <StyledTableCell align="center" width={140}>
@@ -226,7 +206,6 @@ export const ApiFilterTable = () => {
       >
         <Typography>
           <Typography component="span" variant="caption">
-            {/* Total records: {sortedRows.length} /  */}
             Total records: {filteredAndSortedRows.length} / Current page: {page}{' '}
             / Total pages: {pageCount}
           </Typography>
