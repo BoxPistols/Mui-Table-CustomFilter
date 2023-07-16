@@ -1,6 +1,6 @@
 // sｗｗｗｗrc/components/Table/ApiFilterTable.tsx
-import * as React from "react";
-import { styled } from "@mui/material/styles";
+import * as React from "react"
+import { styled } from "@mui/material/styles"
 import {
   Table,
   TableBody,
@@ -17,26 +17,26 @@ import {
   TextField,
   Typography,
   tableCellClasses,
-} from "@mui/material";
-import { useState, useEffect } from "react";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import { Visibility, Edit, Delete, Clear } from "@mui/icons-material";
+} from "@mui/material"
+import { useState, useEffect } from "react"
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward"
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward"
+import { Visibility, Edit, Delete, Clear } from "@mui/icons-material"
 
 // API data type
 type Product = {
-  id: number;
-  title: string;
-  description: string;
-  price: number;
-  discountPercentage: number;
-  rating: number;
-  stock: number;
-  brand: string;
-  category: string;
-  thumbnail: string;
-  images: string[];
-};
+  id: number
+  title: string
+  description: string
+  price: number
+  discountPercentage: number
+  rating: number
+  stock: number
+  brand: string
+  category: string
+  thumbnail: string
+  images: string[]
+}
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   maxHeight: "2.5em",
@@ -55,7 +55,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     fontSize: 14,
     paddingLeft: "1.75em",
   },
-}));
+}))
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
@@ -64,30 +64,30 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:last-child td, &:last-child th": {
     border: 0,
   },
-}));
+}))
 
 // Action Cell
 const handleAction = (action: string, row: Product) => {
   switch (action) {
     case "detail":
-      alert(`${row.title} の詳細です \n ${JSON.stringify(row)}`);
-      break;
+      alert(`${row.title} の詳細です \n ${JSON.stringify(row)}`)
+      break
     case "edit":
       // TODO: Implement edit action.
-      alert(`${row.title} を開き編集します \n 編集ページ \n ${row.id}`);
-      break;
+      alert(`${row.title} を開き編集します \n 編集ページ \n ${row.id}`)
+      break
     case "delete":
       if (window.confirm(`${row.title} を消去してもよろしいですか?`)) {
         // TODO: Implement delete action.
-        alert(`${row.title} を消去しました`);
+        alert(`${row.title} を消去しました`)
       } else {
-        alert(`${row.title} を消去しませんでした`);
+        alert(`${row.title} を消去しませんでした`)
       }
-      break;
+      break
     default:
-      break;
+      break
   }
-};
+}
 
 // Search in all fields of the object
 const multiFieldSearch = (row: Product, query: string) => {
@@ -100,48 +100,48 @@ const multiFieldSearch = (row: Product, query: string) => {
     "stock",
     "brand",
     "category",
-  ];
+  ]
 
   return searchableFields.some((field) =>
     String(row[field]).toLowerCase().includes(query.toLowerCase())
-  );
-};
+  )
+}
 
 export const ApiFilterTable = () => {
-  const [search, setSearch] = useState("");
-  const isSearchEmpty = search === "";
+  const [search, setSearch] = useState("")
+  const isSearchEmpty = search === ""
   const [filteredAndSortedRows, setFilteredAndSortedRows] = useState<Product[]>(
     []
-  );
+  )
 
-  const [rows, setRows] = useState<Product[]>([]); // Defined rows as Product array
+  const [rows, setRows] = useState<Product[]>([]) // Defined rows as Product array
 
-  const [sortField, setSortField] = useState<keyof Product | null>(null); // Defined sortField as keyof Product
-  const [sortDirection, setSortDirection] = useState("asc");
+  const [sortField, setSortField] = useState<keyof Product | null>(null) // Defined sortField as keyof Product
+  const [sortDirection, setSortDirection] = useState("asc")
 
   useEffect(() => {
     fetch("https://dummyjson.com/products")
       .then((response) => response.json())
-      .then((data) => setRows(data.products));
-  }, []);
+      .then((data) => setRows(data.products))
+  }, [])
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-  };
+    setSearch(e.target.value)
+  }
 
   const handleClearSearch = () => {
-    setSearch("");
-    setPage(1);
-  };
+    setSearch("")
+    setPage(1)
+  }
 
   const handleSort = (field: keyof Product) => {
-    let direction = "asc";
+    let direction = "asc"
     if (sortField === field && sortDirection === "asc") {
-      direction = "desc";
+      direction = "desc"
     }
-    setSortField(field);
-    setSortDirection(direction);
-  };
+    setSortField(field)
+    setSortDirection(direction)
+  }
 
   const SortIcon =
     sortDirection === "asc" ? (
@@ -162,42 +162,42 @@ export const ApiFilterTable = () => {
           padding: "0 2px",
         }}
       />
-    );
+    )
 
   // Pagination states
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(1)
 
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(10)
 
   const handlePageChange = (
     _event: React.ChangeEvent<unknown>,
     value: number
   ) => {
-    setPage(value);
-  };
+    setPage(value)
+  }
 
-  const pageCount = Math.ceil(filteredAndSortedRows.length / itemsPerPage);
+  const pageCount = Math.ceil(filteredAndSortedRows.length / itemsPerPage)
   const paginatedRows = filteredAndSortedRows.slice(
     (page - 1) * itemsPerPage,
     page * itemsPerPage
-  );
+  )
 
   useEffect(() => {
     setFilteredAndSortedRows(
       rows
         .filter((row) => multiFieldSearch(row, search))
         .sort((a, b) => {
-          if (sortField === null) return 0;
+          if (sortField === null) return 0
           if (a[sortField] < b[sortField]) {
-            return sortDirection === "asc" ? -1 : 1;
+            return sortDirection === "asc" ? -1 : 1
           }
           if (a[sortField] > b[sortField]) {
-            return sortDirection === "asc" ? 1 : -1;
+            return sortDirection === "asc" ? 1 : -1
           }
-          return 0;
+          return 0
         })
-    );
-  }, [rows, search, sortField, sortDirection, page]); // page added
+    )
+  }, [rows, search, sortField, sortDirection, page]) // page added
 
   return (
     <>
@@ -323,5 +323,5 @@ export const ApiFilterTable = () => {
         <Pagination count={pageCount} page={page} onChange={handlePageChange} />
       </Box>
     </>
-  );
-};
+  )
+}

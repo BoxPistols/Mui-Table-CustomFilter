@@ -5,5 +5,8 @@
   "editor.tabSize": 2,
   "files.autoSave": "afterDelay",
   "editor.formatOnSave": true,
-  "notebook.formatOnSave.enabled": true
+  "notebook.formatOnSave.enabled": true,
+  "prettier.semi": false,
+  "typescript.format.insertSpaceAfterSemicolonInForStatements": false,
+  "autoimport.semicolon": false
 }
