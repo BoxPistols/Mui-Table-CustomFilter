@@ -1,12 +1,12 @@
-import { FC, ChangeEvent } from "react"
+import { FC, ChangeEvent } from 'react'
 import {
   Box,
   FormControl,
   FormLabel,
   IconButton,
   TextField,
-} from "@mui/material"
-import { Clear } from "@mui/icons-material"
+} from '@mui/material'
+import { Clear } from '@mui/icons-material'
 
 type SearchInputProps = {
   search: string
@@ -25,7 +25,7 @@ export const SearchInput: FC<SearchInputProps> = ({
     <Box display="flex" flexDirection="column">
       <FormLabel
         htmlFor="search-input"
-        sx={{ position: "relative", marginBottom: -1.5, fontSize: 12 }}
+        sx={{ position: 'relative', marginBottom: -1.5, fontSize: 12 }}
       >
         データ検索
       </FormLabel>
@@ -37,15 +37,15 @@ export const SearchInput: FC<SearchInputProps> = ({
         margin="normal"
         size="small"
         sx={{
-          position: "relative",
+          position: 'relative',
           marginBottom: 2,
-          minWidth: "20em",
+          minWidth: '20em',
         }}
       />
       {!isSearchEmpty && (
         <IconButton
           onClick={handleClearSearch}
-          sx={{ position: "absolute", top: "0.85em", right: 0 }}
+          sx={{ position: 'absolute', top: '0.85em', right: 0 }}
         >
           <Clear sx={{ fontSize: 18 }} />
         </IconButton>

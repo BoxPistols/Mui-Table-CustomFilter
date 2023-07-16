@@ -1,6 +1,6 @@
 // src/components/Table/SearchFilterTable.tsx
-import * as React from "react"
-import { useState } from "react"
+import * as React from 'react'
+import { useState } from 'react'
 import {
   Table,
   TableBody,
@@ -9,13 +9,13 @@ import {
   TableRow,
   Paper,
   Typography,
-} from "@mui/material"
-import { StyledTableCell } from "./StyledTableCell"
-import { StyledTableRow } from "./StyledTableRow"
-import { SearchInput } from "./SearchInput"
+} from '@mui/material'
+import { StyledTableCell } from './StyledTableCell'
+import { StyledTableRow } from './StyledTableRow'
+import { SearchInput } from './SearchInput'
 
-import { useSort } from "./useSort"
-import { ActionCell } from "./ActionCell"
+import { useSort } from './useSort'
+import { ActionCell } from './ActionCell'
 
 type RowData = {
   name: string
@@ -26,17 +26,17 @@ type RowData = {
 }
 
 const initialRows = [
-  { name: "Frozen yoghurt", calories: 159, fat: 6.0, carbs: 24, protein: 4.0 },
+  { name: 'Frozen yoghurt', calories: 159, fat: 6.0, carbs: 24, protein: 4.0 },
   {
-    name: "Ice cream sandwich",
+    name: 'Ice cream sandwich',
     calories: 237,
     fat: 9.0,
     carbs: 37,
     protein: 4.3,
   },
-  { name: "Eclair", calories: 262, fat: 16.0, carbs: 24, protein: 6.0 },
-  { name: "Cupcake", calories: 305, fat: 3.7, carbs: 67, protein: 4.3 },
-  { name: "Gingerbread", calories: 356, fat: 16.0, carbs: 49, protein: 3.9 },
+  { name: 'Eclair', calories: 262, fat: 16.0, carbs: 24, protein: 6.0 },
+  { name: 'Cupcake', calories: 305, fat: 3.7, carbs: 67, protein: 4.3 },
+  { name: 'Gingerbread', calories: 356, fat: 16.0, carbs: 49, protein: 3.9 },
   // Add More Data dummy random key value Here
 ]
 
@@ -46,18 +46,18 @@ type Column = {
 }
 
 const columns: Column[] = [
-  { label: "Dessert (100g serving)", key: "name" },
-  { label: "Calories", key: "calories" },
-  { label: "Fat (g)", key: "fat" },
-  { label: "Carbs (g)", key: "carbs" },
-  { label: "Protein (g)", key: "protein" },
+  { label: 'Dessert (100g serving)', key: 'name' },
+  { label: 'Calories', key: 'calories' },
+  { label: 'Fat (g)', key: 'fat' },
+  { label: 'Carbs (g)', key: 'carbs' },
+  { label: 'Protein (g)', key: 'protein' },
 ]
 
 // Dummy random key generator
 function generateRandomKey(length: number) {
   const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-  let key = ""
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let key = ''
   for (let i = 0; i < length; i++) {
     const randomIndex = Math.floor(Math.random() * characters.length)
     key += characters.charAt(randomIndex)
@@ -90,23 +90,23 @@ for (let i = 0; i < numberOfEntries; i++) {
 }
 
 export const SearchFilterTable = () => {
-  const [search, setSearch] = useState<string>("")
-  const isSearchEmpty = search === ""
+  const [search, setSearch] = useState<string>('')
+  const isSearchEmpty = search === ''
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value)
   }
 
   const handleClearSearch = () => {
-    setSearch("")
+    setSearch('')
   }
 
   const filteredRows = initialRows.filter((row) =>
-    row.name.toLowerCase().includes(search.toLowerCase())
+    row.name.toLowerCase().includes(search.toLowerCase()),
   )
 
   const { sortedRows, handleSort } = useSort<RowData, keyof RowData>(
-    filteredRows
+    filteredRows,
   )
 
   return (
@@ -148,7 +148,7 @@ export const SearchFilterTable = () => {
                     <StyledTableCell
                       align="right"
                       width={140}
-                      sx={{ whiteSpace: "nowrap" }}
+                      sx={{ whiteSpace: 'nowrap' }}
                     >
                       <ActionCell row={row} />
                     </StyledTableCell>
@@ -160,7 +160,7 @@ export const SearchFilterTable = () => {
                 component="th"
                 scope="row"
                 colSpan={5}
-                sx={{ textAlign: "center" }}
+                sx={{ textAlign: 'center' }}
               >
                 <Typography variant="h5">No results found.</Typography>
               </StyledTableCell>

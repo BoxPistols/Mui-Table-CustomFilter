@@ -1,8 +1,8 @@
-import { Divider, Typography } from "@mui/material";
-import { Container } from "@mui/system";
-import { ApiFilterTable } from "./components/Table/ApiFilterTable";
-import { SearchFilterTable } from "./components/Table/SearchFilterTable";
-import "./App.css";
+import { Divider, Typography } from '@mui/material'
+import { Container } from '@mui/system'
+import { ApiFilterTable } from './components/Table/ApiFilterTable'
+import { SearchFilterTable } from './components/Table/SearchFilterTable'
+import './App.css'
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
         <ApiFilterTable />
       </Container>
     </>
-  );
+  )
 }
 
-export default App;
+export default App

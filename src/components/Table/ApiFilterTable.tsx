@@ -1,6 +1,6 @@
 // src/components/Table/ApiFilterTable.tsx
-import * as React from "react"
-import { styled } from "@mui/material/styles"
+import * as React from 'react'
+import { styled } from '@mui/material/styles'
 import {
   Table,
   TableBody,
@@ -17,11 +17,11 @@ import {
   TextField,
   Typography,
   tableCellClasses,
-} from "@mui/material"
-import { useState, useEffect } from "react"
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward"
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward"
-import { Visibility, Edit, Delete, Clear } from "@mui/icons-material"
+} from '@mui/material'
+import { useState, useEffect } from 'react'
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
+import { Visibility, Edit, Delete, Clear } from '@mui/icons-material'
 
 // API data type
 type Product = {
@@ -39,29 +39,29 @@ type Product = {
 }
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  maxHeight: "2.5em",
-  padding: "0.75em 1.25em",
+  maxHeight: '2.5em',
+  padding: '0.75em 1.25em',
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
     color: theme.palette.common.white,
-    cursor: "pointer",
+    cursor: 'pointer',
     fontWeight: 700,
-    paddingLeft: "1.5em",
-    position: "relative",
+    paddingLeft: '1.5em',
+    position: 'relative',
     fontSize: 15,
-    whiteSpace: "nowrap",
+    whiteSpace: 'nowrap',
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
-    paddingLeft: "1.75em",
+    paddingLeft: '1.75em',
   },
 }))
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
+  '&:nth-of-type(odd)': {
     backgroundColor: theme.palette.action.hover,
   },
-  "&:last-child td, &:last-child th": {
+  '&:last-child td, &:last-child th': {
     border: 0,
   },
 }))
@@ -69,14 +69,14 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 // Action Cell
 const handleAction = (action: string, row: Product) => {
   switch (action) {
-    case "detail":
+    case 'detail':
       alert(`${row.title} の詳細です \n ${JSON.stringify(row)}`)
       break
-    case "edit":
+    case 'edit':
       // TODO: Implement edit action.
       alert(`${row.title} を開き編集します \n 編集ページ \n ${row.id}`)
       break
-    case "delete":
+    case 'delete':
       if (window.confirm(`${row.title} を消去してもよろしいですか?`)) {
         // TODO: Implement delete action.
         alert(`${row.title} を消去しました`)
@@ -93,34 +93,34 @@ const handleAction = (action: string, row: Product) => {
 const multiFieldSearch = (row: Product, query: string) => {
   // Define the fields to include in the search
   const searchableFields: (keyof Product)[] = [
-    "title",
-    "description",
-    "price",
-    "rating",
-    "stock",
-    "brand",
-    "category",
+    'title',
+    'description',
+    'price',
+    'rating',
+    'stock',
+    'brand',
+    'category',
   ]
 
   return searchableFields.some((field) =>
-    String(row[field]).toLowerCase().includes(query.toLowerCase())
+    String(row[field]).toLowerCase().includes(query.toLowerCase()),
   )
 }
 
 export const ApiFilterTable = () => {
-  const [search, setSearch] = useState("")
-  const isSearchEmpty = search === ""
+  const [search, setSearch] = useState('')
+  const isSearchEmpty = search === ''
   const [filteredAndSortedRows, setFilteredAndSortedRows] = useState<Product[]>(
-    []
+    [],
   )
 
   const [rows, setRows] = useState<Product[]>([]) // Defined rows as Product array
 
   const [sortField, setSortField] = useState<keyof Product | null>(null) // Defined sortField as keyof Product
-  const [sortDirection, setSortDirection] = useState("asc")
+  const [sortDirection, setSortDirection] = useState('asc')
 
   useEffect(() => {
-    fetch("https://dummyjson.com/products")
+    fetch('https://dummyjson.com/products')
       .then((response) => response.json())
       .then((data) => setRows(data.products))
   }, [])
@@ -130,36 +130,36 @@ export const ApiFilterTable = () => {
   }
 
   const handleClearSearch = () => {
-    setSearch("")
+    setSearch('')
     setPage(1)
   }
 
   const handleSort = (field: keyof Product) => {
-    let direction = "asc"
-    if (sortField === field && sortDirection === "asc") {
-      direction = "desc"
+    let direction = 'asc'
+    if (sortField === field && sortDirection === 'asc') {
+      direction = 'desc'
     }
     setSortField(field)
     setSortDirection(direction)
   }
 
   const SortIcon =
-    sortDirection === "asc" ? (
+    sortDirection === 'asc' ? (
       <ArrowUpwardIcon
         sx={{
           fontSize: 20,
-          position: "absolute",
-          top: "0.75em",
-          padding: "0 2px",
+          position: 'absolute',
+          top: '0.75em',
+          padding: '0 2px',
         }}
       />
     ) : (
       <ArrowDownwardIcon
         sx={{
           fontSize: 20,
-          position: "absolute",
-          top: "0.75em",
-          padding: "0 2px",
+          position: 'absolute',
+          top: '0.75em',
+          padding: '0 2px',
         }}
       />
     )
@@ -171,7 +171,7 @@ export const ApiFilterTable = () => {
 
   const handlePageChange = (
     _event: React.ChangeEvent<unknown>,
-    value: number
+    value: number,
   ) => {
     setPage(value)
   }
@@ -179,7 +179,7 @@ export const ApiFilterTable = () => {
   const pageCount = Math.ceil(filteredAndSortedRows.length / itemsPerPage)
   const paginatedRows = filteredAndSortedRows.slice(
     (page - 1) * itemsPerPage,
-    page * itemsPerPage
+    page * itemsPerPage,
   )
 
   useEffect(() => {
@@ -189,13 +189,13 @@ export const ApiFilterTable = () => {
         .sort((a, b) => {
           if (sortField === null) return 0
           if (a[sortField] < b[sortField]) {
-            return sortDirection === "asc" ? -1 : 1
+            return sortDirection === 'asc' ? -1 : 1
           }
           if (a[sortField] > b[sortField]) {
-            return sortDirection === "asc" ? 1 : -1
+            return sortDirection === 'asc' ? 1 : -1
           }
           return 0
-        })
+        }),
     )
   }, [rows, search, sortField, sortDirection, page]) // page added
 
@@ -205,7 +205,7 @@ export const ApiFilterTable = () => {
         <Box display="flex" flexDirection="column">
           <FormLabel
             htmlFor="search-input"
-            sx={{ position: "relative", marginBottom: -1.5, fontSize: 12 }}
+            sx={{ position: 'relative', marginBottom: -1.5, fontSize: 12 }}
           >
             データ検索
           </FormLabel>
@@ -218,16 +218,16 @@ export const ApiFilterTable = () => {
             margin="normal"
             size="small"
             sx={{
-              position: "relative",
+              position: 'relative',
               marginBottom: 2,
-              minWidth: "20em",
+              minWidth: '20em',
             }}
           />
 
           {!isSearchEmpty && (
             <IconButton
               onClick={handleClearSearch}
-              sx={{ position: "absolute", top: "0.85em", right: 0 }}
+              sx={{ position: 'absolute', top: '0.85em', right: 0 }}
             >
               <Clear sx={{ fontSize: 18 }} />
             </IconButton>
@@ -242,21 +242,21 @@ export const ApiFilterTable = () => {
         >
           <TableHead>
             <TableRow>
-              <StyledTableCell onClick={() => handleSort("title")}>
+              <StyledTableCell onClick={() => handleSort('title')}>
                 Title
-                {sortField === "title" && SortIcon}
+                {sortField === 'title' && SortIcon}
               </StyledTableCell>
-              <StyledTableCell onClick={() => handleSort("price")}>
+              <StyledTableCell onClick={() => handleSort('price')}>
                 Price
-                {sortField === "price" && SortIcon}
+                {sortField === 'price' && SortIcon}
               </StyledTableCell>
-              <StyledTableCell onClick={() => handleSort("stock")}>
+              <StyledTableCell onClick={() => handleSort('stock')}>
                 Stock
-                {sortField === "stock" && SortIcon}
+                {sortField === 'stock' && SortIcon}
               </StyledTableCell>
-              <StyledTableCell onClick={() => handleSort("rating")}>
+              <StyledTableCell onClick={() => handleSort('rating')}>
                 rating
-                {sortField === "rating" && SortIcon}
+                {sortField === 'rating' && SortIcon}
               </StyledTableCell>
               <StyledTableCell align="center" width={140}>
                 Action
@@ -276,15 +276,15 @@ export const ApiFilterTable = () => {
                   <StyledTableCell
                     align="right"
                     width={140}
-                    sx={{ whiteSpace: "nowrap" }}
+                    sx={{ whiteSpace: 'nowrap' }}
                   >
-                    <IconButton onClick={() => handleAction("detail", row)}>
+                    <IconButton onClick={() => handleAction('detail', row)}>
                       <Visibility />
                     </IconButton>
-                    <IconButton onClick={() => handleAction("edit", row)}>
+                    <IconButton onClick={() => handleAction('edit', row)}>
                       <Edit />
                     </IconButton>
-                    <IconButton onClick={() => handleAction("delete", row)}>
+                    <IconButton onClick={() => handleAction('delete', row)}>
                       <Delete />
                     </IconButton>
                   </StyledTableCell>
@@ -296,27 +296,27 @@ export const ApiFilterTable = () => {
                   component="th"
                   scope="row"
                   colSpan={5}
-                  sx={{ textAlign: "center" }}
+                  sx={{ textAlign: 'center' }}
                 >
                   <Typography variant="h5">No results found.</Typography>
                 </StyledTableCell>
               </StyledTableRow>
             )}
-          </TableBody>{" "}
+          </TableBody>{' '}
         </Table>
       </TableContainer>
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
           marginTop: 1,
         }}
       >
         <Typography>
           <Typography component="span" variant="caption">
             {/* Total records: {sortedRows.length} /  */}
-            Total records: {filteredAndSortedRows.length} / Current page: {page}{" "}
+            Total records: {filteredAndSortedRows.length} / Current page: {page}{' '}
             / Total pages: {pageCount}
           </Typography>
         </Typography>

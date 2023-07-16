@@ -1,6 +1,6 @@
 // ActionCell.tsx
-import { IconButton } from "@mui/material"
-import { Delete, Edit, Visibility } from "@mui/icons-material"
+import { IconButton } from '@mui/material'
+import { Delete, Edit, Visibility } from '@mui/icons-material'
 
 type RowData = {
   name: string
@@ -17,13 +17,13 @@ type ActionCellProps = {
 export const ActionCell = ({ row }: ActionCellProps) => {
   const handleAction = (action: string) => {
     switch (action) {
-      case "detail":
+      case 'detail':
         alert(`${row.name} の詳細です \n ${JSON.stringify(row)}`)
         break
-      case "edit":
+      case 'edit':
         alert(`編集: ${row.name} の編集ページに移動`)
         break
-      case "delete":
+      case 'delete':
         if (window.confirm(`${row.name} を消去してもよろしいですか?`)) {
           alert(`${row.name} を消去しました`)
         } else {
@@ -37,13 +37,13 @@ export const ActionCell = ({ row }: ActionCellProps) => {
 
   return (
     <>
-      <IconButton onClick={() => handleAction("detail")}>
+      <IconButton onClick={() => handleAction('detail')}>
         <Visibility />
       </IconButton>
-      <IconButton onClick={() => handleAction("edit")}>
+      <IconButton onClick={() => handleAction('edit')}>
         <Edit />
       </IconButton>
-      <IconButton onClick={() => handleAction("delete")}>
+      <IconButton onClick={() => handleAction('delete')}>
         <Delete />
       </IconButton>
     </>
