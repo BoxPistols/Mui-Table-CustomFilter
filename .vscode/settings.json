@@ -1,5 +1,12 @@
 {
   "eslint.debug": true,
   "eslint.format.enable": true,
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.tabSize": 2,
+  "files.autoSave": "afterDelay",
+  "editor.formatOnSave": true,
+  "notebook.formatOnSave.enabled": true,
+  "prettier.semi": false,
+  "typescript.format.insertSpaceAfterSemicolonInForStatements": false,
+  "autoimport.semicolon": false
 }
