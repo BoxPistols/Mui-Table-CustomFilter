@@ -12,7 +12,7 @@ export const StyledTableCell = styled(TableCell)(({ theme }) => ({
     paddingLeft: '1.5em',
     position: 'relative',
     fontSize: 15,
-    whiteSpace: 'nowrap',
+    // whiteSpace: 'nowrap',
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
