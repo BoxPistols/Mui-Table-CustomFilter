@@ -31,6 +31,7 @@ import { SortIcon } from './SortIcon'
 import ToggleOnOutlinedIcon from '@mui/icons-material/ToggleOnOutlined'
 import { PagenateDesign } from './PagenateDesign'
 import { ColumnSelector } from './ColumnSelector'
+import { idText } from 'typescript'
 
 // API data type
 type Product = {
@@ -103,6 +104,17 @@ export const ApiFilterTable = () => {
     page * itemsPerPage,
   )
 
+  // New state for keeping track of deleted rows
+  const [deletedRows, setDeletedRows] = useState<string[]>([])
+
+  // Delete function
+  const handleDelete = (rowId: string) => {
+    setDeletedRows([...deletedRows, rowId])
+    setFilteredAndSortedRows(
+      filteredAndSortedRows.filter((row) => row.id.toString() !== rowId),
+    )
+  }
+
   // Search input change handler
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value),
@@ -138,18 +150,21 @@ export const ApiFilterTable = () => {
   // Filter and sort rows
   useEffect(() => {
     setFilteredAndSortedRows(
-      sortedRows.filter((row) => multiFieldSearch(row, search)),
+      sortedRows
+        .filter((row) => multiFieldSearch(row, search))
+        .filter(({ id }) => !deletedRows.includes(id.toString())),
     )
-  }, [sortedRows, search, page])
+  }, [sortedRows, search, deletedRows]) // deletedRowsを依存性配列に追加
 
   // Table columns
   const columns = [
+    { label: 'id', key: 'id' },
     { label: 'Title', key: 'title' },
     { label: 'Price', key: 'price' },
     { label: 'Stock', key: 'stock' },
-    { label: 'Rating', key: 'rating' },
+    // { label: 'Rating', key: 'rating' },
     { label: 'Brand', key: 'brand' },
-    { label: 'Category', key: 'category' },
+    // { label: 'Category', key: 'category' },
     { label: 'Description', key: 'description' },
     { label: 'Thumbnail', key: 'thumbnail' },
   ]
@@ -164,14 +179,20 @@ export const ApiFilterTable = () => {
       setHiddenColumns([...hiddenColumns, field])
     }
   }
-
   const hideAllColumns = () => {
     setHiddenColumns(columns.map((column) => column.key))
   }
-
   const showAllColumns = () => {
     setHiddenColumns([])
   }
+
+  // Filter out deleted rows and columns
+  const visibleRows = paginatedRows.filter(
+    ({ id }) => !deletedRows.includes(id.toString()),
+  )
+  const visibleColumns = columns.filter(
+    ({ key }) => !hiddenColumns.includes(key),
+  )
 
   return (
     <>
@@ -220,42 +241,48 @@ export const ApiFilterTable = () => {
 
           {/* TableBody */}
           <TableBody>
-            {paginatedRows.length > 0 ? (
-              paginatedRows.map((row) => (
-                <StyledTableRow key={row.id}>
-                  {columns
-                    .filter(({ key }) => !hiddenColumns.includes(key))
-                    .map(({ key }) => (
-                      <StyledTableCell
-                        key={key}
-                        component="th"
-                        scope="row"
-                        sx={{ whiteSpace: 'keep-break', minWidth: '140ox' }}
-                      >
-                        {key !== 'thumbnail' && row[key as keyof Product]}
-                        {key === 'thumbnail' && (
-                          <TableContainer
-                            style={{
-                              maxWidth: 120,
-                              width: 'auto',
-                              height: 'auto',
-                            }}
-                          >
-                            <img src={row.thumbnail} alt="dummy" width={120} />
-                          </TableContainer>
-                        )}
-                      </StyledTableCell>
-                    ))}
+            {visibleRows.length > 0 && visibleColumns.length > 0 ? (
+              visibleRows
+                .filter((row) => !deletedRows.includes(row.id.toString())) // Filter out deleted rows
+                .map((row) => (
+                  <StyledTableRow key={row.id}>
+                    {columns
+                      .filter(({ key }) => !hiddenColumns.includes(key))
+                      .map(({ key }) => (
+                        <StyledTableCell
+                          key={key}
+                          component="th"
+                          scope="row"
+                          sx={{ whiteSpace: 'keep-break', minWidth: '140px' }}
+                        >
+                          {key !== 'thumbnail' && row[key as keyof Product]}
+                          {key === 'thumbnail' && (
+                            <TableContainer
+                              style={{
+                                maxWidth: 120,
+                                width: 'auto',
+                                height: 'auto',
+                              }}
+                            >
+                              <img
+                                src={row.thumbnail}
+                                alt="dummy"
+                                width={120}
+                              />
+                            </TableContainer>
+                          )}
+                        </StyledTableCell>
+                      ))}
 
-                  <StyledTableCell
-                    align="right"
-                    width={140}
-                    sx={{ whiteSpace: 'nowrap' }}
-                  >
-                    <ActionCell row={row} />
-                  </StyledTableCell>
-                </StyledTableRow>
-              ))
+                    <StyledTableCell
+                      align="right"
+                      width={140}
+                      sx={{ whiteSpace: 'nowrap' }}
+                    >
+                      <ActionCell row={row} handleDelete={handleDelete} />
+                    </StyledTableCell>
+                  </StyledTableRow>
+                ))
             ) : (
               <StyledTableRow>
                 <StyledTableCell

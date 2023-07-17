@@ -130,6 +130,15 @@ export const SearchFilterTable = () => {
     // Clean up the event listener when the component is unmounted
     return () => window.removeEventListener('keydown', keydownHandler)
   }, [])
+
+  // New state for keeping track of deleted rows
+  const [deletedRows, setDeletedRows] = useState<string[]>([])
+
+  // Delete function
+  const handleDelete = (rowId: string) => {
+    setDeletedRows([...deletedRows, rowId])
+  }
+
   return (
     <>
       <SearchInput
@@ -171,7 +180,7 @@ export const SearchFilterTable = () => {
                     width={140}
                     sx={{ whiteSpace: 'nowrap' }}
                   >
-                    <ActionCell row={row} />
+                    <ActionCell row={row} handleDelete={handleDelete} />
                   </StyledTableCell>
                 </StyledTableRow>
               ))
