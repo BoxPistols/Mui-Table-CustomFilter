@@ -12,6 +12,12 @@ import {
   Box,
   Pagination,
   Typography,
+  Switch,
+  FormControlLabel,
+  IconButton,
+  Menu,
+  MenuItem,
+  Button,
 } from '@mui/material'
 // Table components
 import { StyledTableCell } from './StyledTableCell'
@@ -19,12 +25,12 @@ import { StyledTableRow } from './StyledTableRow'
 // Contained components
 import SearchInput from './SearchInput'
 import { ActionCell } from './ActionCell'
-import { useSort } from './useSort' // useSort hook is imported
+import { useSort } from './useSort'
 import { usePagination } from './usePagination'
-// Icons
-// import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
-// import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import { SortIcon } from './SortIcon'
+import { PagenateDesign } from './PagenateDesign'
+import { ColumnSelector } from './ColumnSelector'
+import { idText } from 'typescript'
 
 // API data type
 type Product = {
@@ -97,6 +103,17 @@ export const ApiFilterTable = () => {
     page * itemsPerPage,
   )
 
+  // New state for keeping track of deleted rows
+  const [deletedRows, setDeletedRows] = useState<string[]>([])
+
+  // Delete function
+  const handleDelete = (rowId: string) => {
+    setDeletedRows([...deletedRows, rowId])
+    setFilteredAndSortedRows(
+      filteredAndSortedRows.filter((row) => row.id.toString() !== rowId),
+    )
+  }
+
   // Search input change handler
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value),
@@ -132,17 +149,49 @@ export const ApiFilterTable = () => {
   // Filter and sort rows
   useEffect(() => {
     setFilteredAndSortedRows(
-      sortedRows.filter((row) => multiFieldSearch(row, search)),
+      sortedRows
+        .filter((row) => multiFieldSearch(row, search))
+        .filter(({ id }) => !deletedRows.includes(id.toString())),
     )
-  }, [sortedRows, search, page])
+  }, [sortedRows, search, deletedRows]) // deletedRowsを依存性配列に追加
 
   // Table columns
   const columns = [
+    { label: 'id', key: 'id' },
     { label: 'Title', key: 'title' },
     { label: 'Price', key: 'price' },
     { label: 'Stock', key: 'stock' },
     { label: 'Rating', key: 'rating' },
+    { label: 'Brand', key: 'brand' },
+    { label: 'Category', key: 'category' },
+    { label: 'Description', key: 'description' },
+    { label: 'Thumbnail', key: 'thumbnail' },
   ]
+
+  // Toggle columns
+  const [hiddenColumns, setHiddenColumns] = useState<string[]>([])
+
+  const toggleColumnVisibility = (field: string) => {
+    if (hiddenColumns.includes(field)) {
+      setHiddenColumns(hiddenColumns.filter((column) => column !== field))
+    } else {
+      setHiddenColumns([...hiddenColumns, field])
+    }
+  }
+  const hideAllColumns = () => {
+    setHiddenColumns(columns.map((column) => column.key))
+  }
+  const showAllColumns = () => {
+    setHiddenColumns([])
+  }
+
+  // Filter out deleted rows and columns
+  const visibleRows = paginatedRows.filter(
+    ({ id }) => !deletedRows.includes(id.toString()),
+  )
+  const visibleColumns = columns.filter(
+    ({ key }) => !hiddenColumns.includes(key),
+  )
 
   return (
     <>
@@ -153,55 +202,96 @@ export const ApiFilterTable = () => {
         handleClearSearch={handleClearSearch}
         isSearchEmpty={isSearchEmpty}
       />
+      <Box>
+        <Box display="flex" justifyContent="flex-end" sx={{ pr: 1 }}>
+          <ColumnSelector
+            columns={columns}
+            hiddenColumns={hiddenColumns}
+            toggleColumnVisibility={toggleColumnVisibility}
+            hideAllColumns={hideAllColumns}
+            showAllColumns={showAllColumns}
+          />
+        </Box>
+      </Box>
 
       <TableContainer component={Paper}>
         <Table
           sx={{ minWidth: 700, minHeight: 300 }}
           aria-label="customized table"
         >
+          {/* TableHead */}
           <TableHead>
             <TableRow>
-              {columns.map(({ label, key }) => (
-                <StyledTableCell key={key} onClick={() => handleSort(key)}>
-                  {label}
-                  {sortField === key && <SortIcon direction={sortDirection} />}
-                </StyledTableCell>
-              ))}
+              {columns
+                .filter(({ key }) => !hiddenColumns.includes(key))
+                .map(({ label, key }) => (
+                  <StyledTableCell key={key} onClick={() => handleSort(key)}>
+                    {label}
+                    {sortField === key && (
+                      <SortIcon direction={sortDirection} />
+                    )}
+                  </StyledTableCell>
+                ))}
               <StyledTableCell align="center" width={140}>
                 Action
               </StyledTableCell>
             </TableRow>
           </TableHead>
+
+          {/* TableBody */}
           <TableBody>
-            {paginatedRows.length > 0 ? (
-              paginatedRows.map((row) => (
-                <StyledTableRow key={row.id}>
-                  {columns.map(({ key }) => (
+            {visibleRows.length > 0 && visibleColumns.length > 0 ? (
+              visibleRows
+                .filter((row) => !deletedRows.includes(row.id.toString())) // Filter out deleted rows
+                .map((row) => (
+                  <StyledTableRow key={row.id}>
+                    {columns
+                      .filter(({ key }) => !hiddenColumns.includes(key))
+                      .map(({ key }) => (
+                        <StyledTableCell
+                          key={key}
+                          component="th"
+                          scope="row"
+                          sx={{ whiteSpace: 'keep-break', minWidth: '140px' }}
+                        >
+                          {key !== 'thumbnail' && row[key as keyof Product]}
+                          {key === 'thumbnail' && (
+                            <TableContainer
+                              style={{
+                                maxWidth: 80,
+                                maxHeight: 60,
+                                width: 'auto',
+                                height: 'auto',
+                                overflow: 'hidden',
+                              }}
+                            >
+                              <img
+                                src={row.thumbnail}
+                                alt="dummy"
+                                width={80}
+                                // height={40}
+                              />
+                            </TableContainer>
+                          )}
+                        </StyledTableCell>
+                      ))}
+
                     <StyledTableCell
-                      key={key}
-                      component="th"
-                      scope="row"
+                      align="right"
+                      width={140}
                       sx={{ whiteSpace: 'nowrap' }}
                     >
-                      {row[key as keyof Product]}
+                      <ActionCell row={row} handleDelete={handleDelete} />
                     </StyledTableCell>
-                  ))}
-
-                  <StyledTableCell
-                    align="right"
-                    width={140}
-                    sx={{ whiteSpace: 'nowrap' }}
-                  >
-                    <ActionCell row={row} />
-                  </StyledTableCell>
-                </StyledTableRow>
-              ))
+                  </StyledTableRow>
+                ))
             ) : (
               <StyledTableRow>
                 <StyledTableCell
                   component="th"
                   scope="row"
-                  colSpan={5}
+                  // 全部結合してセンタリング
+                  colSpan={columns.length + 1}
                   sx={{ textAlign: 'center' }}
                 >
                   <Typography variant="h5">No results found.</Typography>
@@ -212,22 +302,15 @@ export const ApiFilterTable = () => {
         </Table>
       </TableContainer>
 
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginTop: 1,
-        }}
-      >
-        <Typography>
+      <PagenateDesign>
+        <>
           <Typography component="span" variant="caption">
             Total records: {filteredAndSortedRows.length} / Current page: {page}{' '}
             / Total pages: {pageCount}
           </Typography>
-        </Typography>
+        </>
         <Pagination count={pageCount} page={page} onChange={handlePageChange} />
-      </Box>
+      </PagenateDesign>
     </>
   )
 }
