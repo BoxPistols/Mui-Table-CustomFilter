@@ -28,7 +28,6 @@ import { ActionCell } from './ActionCell'
 import { useSort } from './useSort'
 import { usePagination } from './usePagination'
 import { SortIcon } from './SortIcon'
-import ToggleOnOutlinedIcon from '@mui/icons-material/ToggleOnOutlined'
 import { PagenateDesign } from './PagenateDesign'
 import { ColumnSelector } from './ColumnSelector'
 import { idText } from 'typescript'
@@ -162,9 +161,9 @@ export const ApiFilterTable = () => {
     { label: 'Title', key: 'title' },
     { label: 'Price', key: 'price' },
     { label: 'Stock', key: 'stock' },
-    // { label: 'Rating', key: 'rating' },
+    { label: 'Rating', key: 'rating' },
     { label: 'Brand', key: 'brand' },
-    // { label: 'Category', key: 'category' },
+    { label: 'Category', key: 'category' },
     { label: 'Description', key: 'description' },
     { label: 'Thumbnail', key: 'thumbnail' },
   ]
@@ -259,15 +258,18 @@ export const ApiFilterTable = () => {
                           {key === 'thumbnail' && (
                             <TableContainer
                               style={{
-                                maxWidth: 120,
+                                maxWidth: 80,
+                                maxHeight: 60,
                                 width: 'auto',
                                 height: 'auto',
+                                overflow: 'hidden',
                               }}
                             >
                               <img
                                 src={row.thumbnail}
                                 alt="dummy"
-                                width={120}
+                                width={80}
+                                // height={40}
                               />
                             </TableContainer>
                           )}
