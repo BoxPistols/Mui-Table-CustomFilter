@@ -12,12 +12,6 @@ import {
   Box,
   Pagination,
   Typography,
-  Switch,
-  FormControlLabel,
-  IconButton,
-  Menu,
-  MenuItem,
-  Button,
 } from '@mui/material'
 // Table components
 import { StyledTableCell } from './StyledTableCell'
@@ -30,7 +24,9 @@ import { usePagination } from './usePagination'
 import { SortIcon } from './SortIcon'
 import { PagenateDesign } from './PagenateDesign'
 import { ColumnSelector } from './ColumnSelector'
-import { idText } from 'typescript'
+import { useColumnSelector } from './useColumnSelector'
+// FilterForm.tsx
+import { FilterForm } from './FilterForm'
 
 // API data type
 type Product = {
@@ -72,18 +68,86 @@ export const ApiFilterTable = () => {
   const [filteredAndSortedRows, setFilteredAndSortedRows] = useState<Product[]>(
     [],
   )
-
   const [rows, setRows] = useState<Product[]>([]) // Defined rows as Product array
   const { sortedRows, handleSort, sortField, sortDirection } = useSort<
     Product,
     keyof Product
   >(rows)
+  // New state for keeping track of deleted rows
+  const [deletedRows, setDeletedRows] = useState<string[]>([])
 
+  // ----- TODO: ----
+  const [filters, setFilters] = useState<Record<string, string>>({})
+
+  // Fetch data from API and set rows
   useEffect(() => {
     fetch('https://dummyjson.com/products')
       .then((response) => response.json())
-      .then((data) => setRows(data.products))
+      .then((data) => {
+        setRows(data.products)
+      })
   }, [])
+
+  // Compute unique values after rows are fetched and set
+  useEffect(() => {
+    // Compute unique values
+    const uniqueValues: Record<string, string[]> = {}
+    rows.forEach((product: Product) => {
+      for (const key in product) {
+        // Change 'let' to 'const' for 'key'
+        if (!uniqueValues[key as keyof Product]) {
+          uniqueValues[key as keyof Product] = []
+        }
+        if (
+          !uniqueValues[key as keyof Product].includes(
+            String(product[key as keyof Product]),
+          )
+        ) {
+          uniqueValues[key as keyof Product].push(
+            String(product[key as keyof Product]),
+          )
+        }
+      }
+    })
+    setUniqueValues(uniqueValues)
+  }, [rows])
+
+  // フィルタリングの変更を処理する関数を定義します。
+  const handleFilterChange = (
+    newFilters: React.SetStateAction<Record<string, string>>,
+  ) => {
+    setFilters(newFilters)
+  }
+  // フィルタリングの変更を処理する関数を定義します。
+  const filterRows = (
+    row: Product,
+    filters: { [s: string]: unknown } | ArrayLike<unknown>,
+  ) => {
+    // Apply all filters one by one. If a row doesn't pass any filter, it's not included.
+    for (const [key, value] of Object.entries(filters)) {
+      if (
+        value !== '' &&
+        String(row[key as keyof Product]).toLowerCase() !==
+          (value as string).toLowerCase()
+      ) {
+        return false
+      }
+    }
+    return true
+  }
+
+  // ... some other codes ...
+  useEffect(() => {
+    setFilteredAndSortedRows(
+      sortedRows
+        .filter((row) => multiFieldSearch(row, search))
+        .filter((row) => filterRows(row, filters))
+        .filter(({ id }) => !deletedRows.includes(id.toString())),
+    )
+  }, [sortedRows, search, deletedRows, filters])
+
+  // add the new state to handle unique values
+  const [uniqueValues, setUniqueValues] = useState<Record<string, string[]>>({})
 
   // Pagination states
   const {
@@ -102,9 +166,6 @@ export const ApiFilterTable = () => {
     (page - 1) * itemsPerPage,
     page * itemsPerPage,
   )
-
-  // New state for keeping track of deleted rows
-  const [deletedRows, setDeletedRows] = useState<string[]>([])
 
   // Delete function
   const handleDelete = (rowId: string) => {
@@ -169,21 +230,12 @@ export const ApiFilterTable = () => {
   ]
 
   // Toggle columns
-  const [hiddenColumns, setHiddenColumns] = useState<string[]>([])
-
-  const toggleColumnVisibility = (field: string) => {
-    if (hiddenColumns.includes(field)) {
-      setHiddenColumns(hiddenColumns.filter((column) => column !== field))
-    } else {
-      setHiddenColumns([...hiddenColumns, field])
-    }
-  }
-  const hideAllColumns = () => {
-    setHiddenColumns(columns.map((column) => column.key))
-  }
-  const showAllColumns = () => {
-    setHiddenColumns([])
-  }
+  const {
+    hiddenColumns,
+    toggleColumnVisibility,
+    hideAllColumns,
+    showAllColumns,
+  } = useColumnSelector(columns)
 
   // Filter out deleted rows and columns
   const visibleRows = paginatedRows.filter(
@@ -202,6 +254,14 @@ export const ApiFilterTable = () => {
         handleClearSearch={handleClearSearch}
         isSearchEmpty={isSearchEmpty}
       />
+
+      {/* In the render method of ApiFilterTable */}
+      <FilterForm
+        columns={columns as { label: string; key: string }[]}
+        onFilterChange={handleFilterChange}
+        uniqueValues={uniqueValues}
+      />
+
       <Box>
         <Box display="flex" justifyContent="flex-end" sx={{ pr: 1 }}>
           <ColumnSelector
