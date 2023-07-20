@@ -1,4 +1,4 @@
-// src/components/Table/ApiFilterTable.tsx
+// // file name is ApiFilterTable.tsx
 import * as React from 'react'
 import { useState, useEffect, useRef } from 'react'
 
@@ -117,7 +117,15 @@ export const ApiFilterTable = () => {
     newFilters: React.SetStateAction<Record<string, string>>,
   ) => {
     setFilters(newFilters)
+    // FIXME: Debug
+    console.log(newFilters)
   }
+
+  useEffect(() => {
+    // FIXME: Debug
+    console.log(filters);
+  }, [filters]);
+
   // フィルタリングの変更を処理する関数を定義します。
   const filterRows = (
     row: Product,
@@ -128,7 +136,7 @@ export const ApiFilterTable = () => {
       if (
         value !== '' &&
         String(row[key as keyof Product]).toLowerCase() !==
-          (value as string).toLowerCase()
+        (value as string).toLowerCase()
       ) {
         return false
       }
@@ -207,14 +215,14 @@ export const ApiFilterTable = () => {
     return () => window.removeEventListener('keydown', keydownHandler)
   }, [])
 
-  // Filter and sort rows
-  useEffect(() => {
-    setFilteredAndSortedRows(
-      sortedRows
-        .filter((row) => multiFieldSearch(row, search))
-        .filter(({ id }) => !deletedRows.includes(id.toString())),
-    )
-  }, [sortedRows, search, deletedRows]) // deletedRowsを依存性配列に追加
+  // // Filter and sort rows
+  // useEffect(() => {
+  //   setFilteredAndSortedRows(
+  //     sortedRows
+  //       .filter((row) => multiFieldSearch(row, search))
+  //       .filter(({ id }) => !deletedRows.includes(id.toString())),
+  //   )
+  // }, [sortedRows, search, deletedRows]) // deletedRowsを依存性配列に追加
 
   // Table columns
   const columns = [
@@ -329,7 +337,7 @@ export const ApiFilterTable = () => {
                                 src={row.thumbnail}
                                 alt="dummy"
                                 width={80}
-                                // height={40}
+                              // height={40}
                               />
                             </TableContainer>
                           )}
