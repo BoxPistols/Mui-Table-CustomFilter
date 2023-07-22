@@ -1,4 +1,6 @@
 // file name is FilterForm.tsx
+import { useState } from 'react'
+
 import {
   Box,
   FormControl,
@@ -8,7 +10,6 @@ import {
   SelectChangeEvent,
   Button,
 } from '@mui/material'
-import { useState, useEffect } from 'react'
 
 interface Column {
   key: string
@@ -28,20 +29,29 @@ export const FilterForm = ({
   uniqueValues,
   onClickClearFilters,
 }: FilterFormProps) => {
-  const [filters, setFilters] = useState<Record<string, string>>({})
 
-  const handleFilterChange = (event: SelectChangeEvent) => {
+  const initialFilterValue = "";
+  const [filters, setFilters] = useState<Record<string, string>>(columns.reduce((acc, column) => ({
+    ...acc,
+    [column.key]: initialFilterValue
+  }), {}));
+
+  const handleFilterChange = (event: SelectChangeEvent<string>) => {
     const newFilters = {
       ...filters,
-      [event.target.name]: event.target.value,
+      [event.target.name]: event.target.value || initialFilterValue,
     }
     setFilters(newFilters)
     onFilterChange(newFilters)
   }
 
-  useEffect(() => {
-    setFilters({})
-  }, [columns])
+  const clearFilters = () => {
+    onClickClearFilters();
+    setFilters(columns.reduce((acc, column) => ({
+      ...acc,
+      [column.key]: initialFilterValue
+    }), {}));
+  }
 
   return (
     <Box
@@ -54,7 +64,6 @@ export const FilterForm = ({
           size="small"
           sx={{ minWidth: 180 }}
         >
-          {/* Shrink */}
           <InputLabel
             id={`${column.key}-filter-label`}
             shrink
@@ -72,7 +81,7 @@ export const FilterForm = ({
             labelId={`${column.key}-filter-label`}
             id={`${column.key}-filter`}
             name={column.key}
-            value={filters[column.key]}
+            value={filters[column.key] || initialFilterValue}
             onChange={handleFilterChange}
             label={column.label}
             sx={{
@@ -86,7 +95,6 @@ export const FilterForm = ({
             <MenuItem value="">
               <em>None</em>
             </MenuItem>
-            {/* Map over the unique values for the column */}
             {uniqueValues[column.key]?.map((value: string) => (
               <MenuItem key={value} value={value}>
                 {value}
@@ -95,15 +103,14 @@ export const FilterForm = ({
           </Select>
         </FormControl>
       ))}
-      <Button onClick={() => onClickClearFilters()}
+      <Button onClick={clearFilters}
         variant="outlined"
         sx={{
           display: 'block',
           minWidth: 180,
           minHeight: 38,
-          // mt: 2,
         }}
       >Clear All Filters</Button>
-    </Box >
+    </Box>
   )
 }
