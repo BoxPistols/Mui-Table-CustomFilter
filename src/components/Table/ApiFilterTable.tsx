@@ -144,7 +144,7 @@ export const ApiFilterTable = () => {
     return true
   }
 
-  // ... some other codes ...
+  // Filter and sort rows
   useEffect(() => {
     setFilteredAndSortedRows(
       sortedRows
@@ -215,15 +215,6 @@ export const ApiFilterTable = () => {
     return () => window.removeEventListener('keydown', keydownHandler)
   }, [])
 
-  // // Filter and sort rows
-  // useEffect(() => {
-  //   setFilteredAndSortedRows(
-  //     sortedRows
-  //       .filter((row) => multiFieldSearch(row, search))
-  //       .filter(({ id }) => !deletedRows.includes(id.toString())),
-  //   )
-  // }, [sortedRows, search, deletedRows]) // deletedRowsを依存性配列に追加
-
   // Table columns
   const columns = [
     { label: 'id', key: 'id' },
@@ -268,6 +259,7 @@ export const ApiFilterTable = () => {
         columns={columns as { label: string; key: string }[]}
         onFilterChange={handleFilterChange}
         uniqueValues={uniqueValues}
+        onClickClearFilters={() => setFilters({})}
       />
 
       <Box>
@@ -281,6 +273,12 @@ export const ApiFilterTable = () => {
           />
         </Box>
       </Box>
+
+      {/* <Button
+        onClick={() => setFilters({})}
+      >
+        Clear All Filters
+      </Button> */}
 
       <TableContainer component={Paper}>
         <Table

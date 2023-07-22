@@ -6,24 +6,27 @@ import {
   Select,
   MenuItem,
   SelectChangeEvent,
+  Button,
 } from '@mui/material'
 import { useState, useEffect } from 'react'
 
 interface Column {
   key: string
-  label: string
+  label: string | JSX.Element | JSX.Element[] | undefined
 }
 
 interface FilterFormProps {
   columns: Column[]
   onFilterChange: (filters: Record<string, string>) => void
-  uniqueValues: Record<string, string[]> // new prop for unique values of each column
+  uniqueValues: Record<string, string[]>
+  onClickClearFilters: () => void
 }
 
 export const FilterForm = ({
   columns,
   onFilterChange,
-  uniqueValues, // receive uniqueValues as a prop
+  uniqueValues,
+  onClickClearFilters,
 }: FilterFormProps) => {
   const [filters, setFilters] = useState<Record<string, string>>({})
 
@@ -41,7 +44,9 @@ export const FilterForm = ({
   }, [columns])
 
   return (
-    <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 2 }}>
+    <Box
+      display='flex' alignItems="flex-end"
+      sx={{ gap: 2, flexWrap: 'wrap', mb: 2 }}>
       {columns.map((column: Column) => (
         <FormControl
           key={column.key}
@@ -49,16 +54,34 @@ export const FilterForm = ({
           size="small"
           sx={{ minWidth: 180 }}
         >
-          <InputLabel id={`${column.key}-filter-label`}>
+          {/* Shrink */}
+          <InputLabel
+            id={`${column.key}-filter-label`}
+            shrink
+            htmlFor=""
+            sx={{
+              position: 'relative',
+              top: '10px',
+              left: '-12px',
+            }}
+          >
             {column.label}
           </InputLabel>
           <Select
+            inputProps={{ shrink: true }}
             labelId={`${column.key}-filter-label`}
             id={`${column.key}-filter`}
             name={column.key}
-            value={filters[column.key] || ''}
+            value={filters[column.key]}
             onChange={handleFilterChange}
             label={column.label}
+            sx={{
+              maxWidth: 240,
+              color: 'text.primary',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'text.primary',
+              },
+            }}
           >
             <MenuItem value="">
               <em>None</em>
@@ -72,6 +95,15 @@ export const FilterForm = ({
           </Select>
         </FormControl>
       ))}
-    </Box>
+      <Button onClick={() => onClickClearFilters()}
+        variant="outlined"
+        sx={{
+          display: 'block',
+          minWidth: 180,
+          minHeight: 38,
+          // mt: 2,
+        }}
+      >Clear All Filters</Button>
+    </Box >
   )
 }
