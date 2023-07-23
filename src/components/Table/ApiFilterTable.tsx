@@ -29,6 +29,8 @@ import { ColumnSelector } from './ColumnSelector'
 import { useColumnSelector } from './useColumnSelector'
 // フィルタフォームをインポートします
 import { FilterForm } from './FilterForm'
+// 列の内容をインポート
+import { columns } from './columns';
 
 // プロダクトの型を定義します。これはAPIから取得するデータの型です
 type Product = {
@@ -214,19 +216,6 @@ export const ApiFilterTable = () => {
     // Clean up the event listener when the component is unmounted
     return () => window.removeEventListener('keydown', keydownHandler)
   }, [])
-
-  // これは、Tableコンポーネントのcolumnsプロパティに渡す値です
-  const columns = [
-    { label: 'id', key: 'id' },
-    { label: 'Title', key: 'title' },
-    { label: 'Price', key: 'price' },
-    { label: 'Stock', key: 'stock' },
-    { label: 'Rating', key: 'rating' },
-    { label: 'Brand', key: 'brand' },
-    { label: 'Category', key: 'category' },
-    { label: 'Description', key: 'description' },
-    { label: 'Thumbnail', key: 'thumbnail' },
-  ]
 
   // 列の表示状態を管理するカスタムフックを使用します
   const {
