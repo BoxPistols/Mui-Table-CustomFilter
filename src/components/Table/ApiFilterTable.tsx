@@ -30,38 +30,20 @@ import { useColumnSelector } from './useColumnSelector'
 // フィルタフォームをインポートします
 import { FilterForm } from './FilterForm'
 // 列の内容をインポート
-import { columns } from './columns';
+import { columns } from './columns'
+// typesをインポートします
+import { Product } from './types'
 
-// プロダクトの型を定義します。これはAPIから取得するデータの型です
-type Product = {
-  id: number
-  title: string
-  description: string
-  price: number
-  discountPercentage: number
-  rating: number
-  stock: number
-  brand: string
-  category: string
-  thumbnail: string
-  images: string[]
-}
 
-// 複数のフィールドを対象にした検索関数です
+// // 複数のフィールドを対象にした検索関数です
 const multiFieldSearch = (row: Product, query: string) => {
   // 検索に含めるフィールドを定義します
-  const searchableFields: (keyof Product)[] = [
-    'title',
-    'description',
-    'price',
-    'rating',
-    'stock',
-    'brand',
-    'category',
-  ]
-
+  const searchableFields = ['title', 'description', 'brand', 'category']
+  // 一つでもフィールドに検索クエリが含まれていればtrueを返します
   return searchableFields.some((field) =>
-    String(row[field]).toLowerCase().includes(query.toLowerCase()),
+    String(row[field as keyof Product])
+      .toLowerCase()
+      .includes(query.toLowerCase()),
   )
 }
 
@@ -138,12 +120,14 @@ export const ApiFilterTable = () => {
     for (const [key, value] of Object.entries(filters)) {
       if (
         value !== '' &&
-        !String(row[key as keyof Product]).toLowerCase().includes((value as string).toLowerCase())
+        !String(row[key as keyof Product])
+          .toLowerCase()
+          .includes((value as string).toLowerCase())
       ) {
-        return false;
+        return false
       }
     }
-    return true;
+    return true
   }
 
   // 行のフィルタリングとソートを適用します
@@ -153,8 +137,8 @@ export const ApiFilterTable = () => {
         .filter((row) => isSearchEmpty || multiFieldSearch(row, search))
         .filter((row) => filterRows(row, filters))
         .filter(({ id }) => !deletedRows.includes(id.toString())),
-    );
-  }, [sortedRows, search, deletedRows, filters, isSearchEmpty]);
+    )
+  }, [sortedRows, search, deletedRows, filters, isSearchEmpty])
 
   // ユニークな値を追加するための新しいstateを追加します
   const [uniqueValues, setUniqueValues] = useState<Record<string, string[]>>({})

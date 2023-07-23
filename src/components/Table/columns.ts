@@ -1,23 +1,9 @@
-// columns.js
-interface Product {
-  id: number;
-  title: string;
-  name: string;
-  description: string;
-  price: number;
-  thumbnail: string;
-  images: string[];
-  discountPercentage: number;
-  rating: number;
-  stock: number;
-  brand: string;
-  category: string;
-}
+// columns.ts
+import { Product } from './types'
 
-interface Column {
-  label: string;
+export type Column = {
+  label: string
   key: keyof Product
-  // | 'images' | 'discountPercentage' | 'rating' | 'stock' | 'price' | 'description' | 'thumbnail' | 'category' | 'brand' | 'title' | 'id';
 }
 
 export const columns: Column[] = [
@@ -31,9 +17,11 @@ export const columns: Column[] = [
   { label: 'Description', key: 'description' },
   { label: 'Thumbnail', key: 'thumbnail' },
   // { label: 'Images', key: 'images' }
-];
-// https://dummyjson.com/products
+]
+
 /**
+ @ https://dummyjson.com/products
+ 
  "products": [
   {
     "id": 1,

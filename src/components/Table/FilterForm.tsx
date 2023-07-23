@@ -1,6 +1,14 @@
 // FilterForm.tsx
 import { useState } from 'react'
-import { Box, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Button } from '@mui/material'
+import {
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
+  Button,
+} from '@mui/material'
 
 /**
  * 各テーブル列の情報を表す型
@@ -24,12 +32,22 @@ interface FilterFormProps {
  * フィルターフォームコンポーネントを定義します。
  * 各テーブル列のフィルターを選択するSelectと全フィルターをクリアするボタンを表示します。
  */
-export const FilterForm = ({ columns, onFilterChange, uniqueValues, onClickClearFilters }: FilterFormProps) => {
-  const initialFilterValue = "";
-  const [filters, setFilters] = useState<Record<string, string>>(columns.reduce((acc, column) => ({
-    ...acc,
-    [column.key]: initialFilterValue
-  }), {}));
+export const FilterForm = ({
+  columns,
+  onFilterChange,
+  uniqueValues,
+  onClickClearFilters,
+}: FilterFormProps) => {
+  const initialFilterValue = ''
+  const [filters, setFilters] = useState<Record<string, string>>(
+    columns.reduce(
+      (acc, column) => ({
+        ...acc,
+        [column.key]: initialFilterValue,
+      }),
+      {},
+    ),
+  )
 
   /**
    * フィルターが変更されたときに実行されるハンドラ
@@ -49,23 +67,44 @@ export const FilterForm = ({ columns, onFilterChange, uniqueValues, onClickClear
    * 全てのフィルターを初期値にリセットし、親にクリアイベントを通知します。
    */
   const clearFilters = () => {
-    onClickClearFilters();
-    setFilters(columns.reduce((acc, column) => ({
-      ...acc,
-      [column.key]: initialFilterValue
-    }), {}));
+    onClickClearFilters()
+    setFilters(
+      columns.reduce(
+        (acc, column) => ({
+          ...acc,
+          [column.key]: initialFilterValue,
+        }),
+        {},
+      ),
+    )
   }
 
   /**
    * フィルターフォームのレンダリング
    */
   return (
-    <Box display='flex' alignItems="flex-end" sx={{ gap: 2, flexWrap: 'wrap', mb: 2 }}>
+    <Box
+      display="flex"
+      alignItems="flex-end"
+      sx={{ gap: 2, flexWrap: 'wrap', mb: 2 }}
+    >
       {/* // 各テーブル列のフィルターを選択するSelectを表示します。 */}
       {columns.map((column: Column) => (
-        <FormControl key={column.key} variant="outlined" size="small" sx={{ minWidth: 180 }}>
+        <FormControl
+          key={column.key}
+          variant="outlined"
+          size="small"
+          sx={{ minWidth: 180 }}
+        >
           {/* // フィルターのラベルを表示します。 */}
-          <InputLabel id={`${column.key}-filter-label`} shrink htmlFor="" sx={{ position: 'relative', top: '10px', left: '-12px' }}>{column.label}</InputLabel>
+          <InputLabel
+            id={`${column.key}-filter-label`}
+            shrink
+            htmlFor=""
+            sx={{ position: 'relative', top: '10px', left: '-12px' }}
+          >
+            {column.label}
+          </InputLabel>
           {/* // フィルターの状態を設定し、フィルターの変更イベントを親に通知します。 */}
           <Select
             // フィルターの状態を設定します。
@@ -80,20 +119,35 @@ export const FilterForm = ({ columns, onFilterChange, uniqueValues, onClickClear
             onChange={handleFilterChange}
             label={column.label}
             // フィルターの選択肢のスタイルを設定します。
-            sx={{ maxWidth: 240, color: 'text.primary', '& .MuiOutlinedInput-notchedOutline': { borderColor: 'text.primary' } }}
+            sx={{
+              maxWidth: 240,
+              color: 'text.primary',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'text.primary',
+              },
+            }}
           >
             {/* // フィルターの選択肢を表示します。 */}
-            <MenuItem value=""><em>None</em></MenuItem>
+            <MenuItem value="">
+              <em>None</em>
+            </MenuItem>
             {/* // フィルターの選択肢を表示します。 */}
             {uniqueValues[column.key]?.map((value: string) => (
-              <MenuItem key={value} value={value}>{value}</MenuItem>
+              <MenuItem key={value} value={value}>
+                {value}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
-      ))
-      }
+      ))}
       {/* // 全てのフィルターをクリアするボタンを表示します。 */}
-      <Button onClick={clearFilters} variant="outlined" sx={{ display: 'block', minWidth: 180, minHeight: 38 }}>Clear All Filters</Button>
-    </Box >
+      <Button
+        onClick={clearFilters}
+        variant="outlined"
+        sx={{ display: 'block', minWidth: 180, minHeight: 38 }}
+      >
+        Clear All Filters
+      </Button>
+    </Box>
   )
 }
