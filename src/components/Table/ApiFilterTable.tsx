@@ -1,7 +1,6 @@
-// // file name is ApiFilterTable.tsx
+// Reactなどの必要なライブラリやコンポーネントをインポートします
 import * as React from 'react'
 import { useState, useEffect, useRef } from 'react'
-
 import {
   Table,
   TableBody,
@@ -13,22 +12,25 @@ import {
   Pagination,
   Typography,
 } from '@mui/material'
-// Table components
+// 表のスタイリングに使用するカスタムコンポーネントをインポートします
 import { StyledTableCell } from './StyledTableCell'
 import { StyledTableRow } from './StyledTableRow'
-// Contained components
+// 使用するコンポーネントをインポートします
 import SearchInput from './SearchInput'
 import { ActionCell } from './ActionCell'
+// ソートとページネーションのカスタムフックをインポートします
 import { useSort } from './useSort'
 import { usePagination } from './usePagination'
+// ソートアイコン、ページネートデザイン、列セレクタのコンポーネントをインポートします
 import { SortIcon } from './SortIcon'
 import { PagenateDesign } from './PagenateDesign'
 import { ColumnSelector } from './ColumnSelector'
+// 列の表示状態を管理するカスタムフックをインポートします
 import { useColumnSelector } from './useColumnSelector'
-// FilterForm.tsx
+// フィルタフォームをインポートします
 import { FilterForm } from './FilterForm'
 
-// API data type
+// プロダクトの型を定義します。これはAPIから取得するデータの型です
 type Product = {
   id: number
   title: string
@@ -43,9 +45,9 @@ type Product = {
   images: string[]
 }
 
-// Search in all fields of the object
+// 複数のフィールドを対象にした検索関数です
 const multiFieldSearch = (row: Product, query: string) => {
-  // Define the fields to include in the search
+  // 検索に含めるフィールドを定義します
   const searchableFields: (keyof Product)[] = [
     'title',
     'description',
@@ -61,25 +63,27 @@ const multiFieldSearch = (row: Product, query: string) => {
   )
 }
 
+// ApiFilterTableコンポーネントを定義します
 export const ApiFilterTable = () => {
+  // 各種stateを定義します
   const [search, setSearch] = useState('')
   const searchInputRef = useRef<HTMLInputElement | null>(null)
   const isSearchEmpty = search === ''
   const [filteredAndSortedRows, setFilteredAndSortedRows] = useState<Product[]>(
     [],
   )
-  const [rows, setRows] = useState<Product[]>([]) // Defined rows as Product array
+  const [rows, setRows] = useState<Product[]>([]) // rowsをProduct型の配列として定義します
   const { sortedRows, handleSort, sortField, sortDirection } = useSort<
     Product,
     keyof Product
   >(rows)
-  // New state for keeping track of deleted rows
+  // 削除された行を追跡する新しいstateを定義します
   const [deletedRows, setDeletedRows] = useState<string[]>([])
 
-  // ----- TODO: ----
+  // フィルタを定義します
   const [filters, setFilters] = useState<Record<string, string>>({})
 
-  // Fetch data from API and set rows
+  // APIからデータを取得してrowsを設定します
   useEffect(() => {
     fetch('https://dummyjson.com/products')
       .then((response) => response.json())
@@ -88,13 +92,12 @@ export const ApiFilterTable = () => {
       })
   }, [])
 
-  // Compute unique values after rows are fetched and set
+  // rowsが取得・設定された後にユニークな値を計算します
   useEffect(() => {
-    // Compute unique values
+    // ユニークな値を計算します
     const uniqueValues: Record<string, string[]> = {}
     rows.forEach((product: Product) => {
       for (const key in product) {
-        // Change 'let' to 'const' for 'key'
         if (!uniqueValues[key as keyof Product]) {
           uniqueValues[key as keyof Product] = []
         }
@@ -112,57 +115,54 @@ export const ApiFilterTable = () => {
     setUniqueValues(uniqueValues)
   }, [rows])
 
-  // フィルタリングの変更を処理する関数を定義します。
+  // フィルタの変更を処理する関数を定義します
   const handleFilterChange = (
     newFilters: React.SetStateAction<Record<string, string>>,
   ) => {
     setFilters(newFilters)
-    // FIXME: Debug
-    console.log(newFilters)
   }
 
+  // フィルタの変更を監視し、適用します
   useEffect(() => {
-    // FIXME: Debug
-    console.log(filters);
-  }, [filters]);
+    // フィルタが変更された時の動作をここに書きます
+  }, [filters])
 
-  // フィルタリングの変更を処理する関数を定義します。
+  // フィルタリングを適用する関数を定義します
   const filterRows = (
     row: Product,
     filters: { [s: string]: unknown } | ArrayLike<unknown>,
   ) => {
-    // Apply all filters one by one. If a row doesn't pass any filter, it's not included.
+    // すべてのフィルタを順に適用します。一つでも通らないフィルタがあれば、その行は含まれません。
     for (const [key, value] of Object.entries(filters)) {
       if (
         value !== '' &&
-        String(row[key as keyof Product]).toLowerCase() !==
-        (value as string).toLowerCase()
+        !String(row[key as keyof Product]).toLowerCase().includes((value as string).toLowerCase())
       ) {
-        return false
+        return false;
       }
     }
-    return true
+    return true;
   }
 
-  // Filter and sort rows
+  // 行のフィルタリングとソートを適用します
   useEffect(() => {
     setFilteredAndSortedRows(
       sortedRows
-        .filter((row) => multiFieldSearch(row, search))
+        .filter((row) => isSearchEmpty || multiFieldSearch(row, search))
         .filter((row) => filterRows(row, filters))
         .filter(({ id }) => !deletedRows.includes(id.toString())),
-    )
-  }, [sortedRows, search, deletedRows, filters])
+    );
+  }, [sortedRows, search, deletedRows, filters, isSearchEmpty]);
 
-  // add the new state to handle unique values
+  // ユニークな値を追加するための新しいstateを追加します
   const [uniqueValues, setUniqueValues] = useState<Record<string, string[]>>({})
 
-  // Pagination states
+  // usePaginationフックを使用して、ページネーションの状態を定義します
   const {
     page,
     itemsPerPage,
     handlePageChange,
-    handleDirectPageChange, // You now have access to this function
+    handleDirectPageChange, // ページを直接変更する関数
   } = usePagination({
     page: 1,
     itemsPerPage: 10,
@@ -175,7 +175,7 @@ export const ApiFilterTable = () => {
     page * itemsPerPage,
   )
 
-  // Delete function
+  // 削除ボタンのハンドラを定義します
   const handleDelete = (rowId: string) => {
     setDeletedRows([...deletedRows, rowId])
     setFilteredAndSortedRows(
@@ -183,7 +183,7 @@ export const ApiFilterTable = () => {
     )
   }
 
-  // Search input change handler
+  // 検索フィールドの変更ハンドラを定義します
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value),
       setFilteredAndSortedRows(
@@ -193,12 +193,12 @@ export const ApiFilterTable = () => {
     handleDirectPageChange(1)
   }
 
-  // Clear search input
+  // 検索フィールドをクリアする関数を定義します
   function handleClearSearch(): void {
     setSearch('')
   }
 
-  // Keyboard shortcuts
+  // キーボードショートカットを定義します
   useEffect(() => {
     const keydownHandler = (event: KeyboardEvent) => {
       // ESCキーで検索をクリア
@@ -215,7 +215,7 @@ export const ApiFilterTable = () => {
     return () => window.removeEventListener('keydown', keydownHandler)
   }, [])
 
-  // Table columns
+  // これは、Tableコンポーネントのcolumnsプロパティに渡す値です
   const columns = [
     { label: 'id', key: 'id' },
     { label: 'Title', key: 'title' },
@@ -228,7 +228,7 @@ export const ApiFilterTable = () => {
     { label: 'Thumbnail', key: 'thumbnail' },
   ]
 
-  // Toggle columns
+  // 列の表示状態を管理するカスタムフックを使用します
   const {
     hiddenColumns,
     toggleColumnVisibility,
@@ -236,7 +236,7 @@ export const ApiFilterTable = () => {
     showAllColumns,
   } = useColumnSelector(columns)
 
-  // Filter out deleted rows and columns
+  // 削除された行と列をフィルタリングします
   const visibleRows = paginatedRows.filter(
     ({ id }) => !deletedRows.includes(id.toString()),
   )
@@ -253,8 +253,7 @@ export const ApiFilterTable = () => {
         handleClearSearch={handleClearSearch}
         isSearchEmpty={isSearchEmpty}
       />
-
-      {/* In the render method of ApiFilterTable */}
+      {/* // これは、FilterFormコンポーネントを呼び出すコードです */}
       <FilterForm
         columns={columns as { label: string; key: string }[]}
         onFilterChange={handleFilterChange}
@@ -264,6 +263,7 @@ export const ApiFilterTable = () => {
 
       <Box>
         <Box display="flex" justifyContent="flex-end" sx={{ pr: 1 }}>
+          {/* // これは、ColumnSelectorコンポーネントを呼び出すコードです */}
           <ColumnSelector
             columns={columns}
             hiddenColumns={hiddenColumns}
@@ -274,18 +274,12 @@ export const ApiFilterTable = () => {
         </Box>
       </Box>
 
-      {/* <Button
-        onClick={() => setFilters({})}
-      >
-        Clear All Filters
-      </Button> */}
-
       <TableContainer component={Paper}>
         <Table
           sx={{ minWidth: 700, minHeight: 300 }}
           aria-label="customized table"
         >
-          {/* TableHead */}
+          {/* // これは、TableHeadコンポーネントのchildrenプロパティに渡す値です */}
           <TableHead>
             <TableRow>
               {columns
@@ -311,6 +305,7 @@ export const ApiFilterTable = () => {
                 .filter((row) => !deletedRows.includes(row.id.toString())) // Filter out deleted rows
                 .map((row) => (
                   <StyledTableRow key={row.id}>
+                    {/* // これは、TableBodyコンポーネントのchildrenプロパティに渡す値です */}
                     {columns
                       .filter(({ key }) => !hiddenColumns.includes(key))
                       .map(({ key }) => (
@@ -368,6 +363,7 @@ export const ApiFilterTable = () => {
         </Table>
       </TableContainer>
 
+      {/* // これは、ページネーションを表示するコードです */}
       <PagenateDesign>
         <>
           <Typography component="span" variant="caption">
