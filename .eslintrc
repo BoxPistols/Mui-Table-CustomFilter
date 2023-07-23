@@ -9,7 +9,7 @@
   ],
   "rules": {
     "react/react-in-jsx-scope": "off",
-    "@typescript-eslint/no-unused-vars": "off"
+    "@typescript-eslint/no:-unused-vars": "off"
   },
   "parserOptions": {
     "ecmaVersion": 2020,
