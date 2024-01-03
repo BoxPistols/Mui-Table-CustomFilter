@@ -9,5 +9,10 @@
   "prettier.semi": false,
   "typescript.format.insertSpaceAfterSemicolonInForStatements": false,
   "autoimport.semicolon": false,
-  "codemetrics.basics.CodeLensEnabled": false
+  "codemetrics.basics.CodeLensEnabled": false,
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#25138A",
+    "titleBar.activeBackground": "#341BC1",
+    "titleBar.activeForeground": "#FAF9FE"
+  }
 }

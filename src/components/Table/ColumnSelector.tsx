@@ -66,19 +66,24 @@ export const ColumnSelector = ({
         ))}
         <Box display="flex">
           <MenuItem>
-            <Button variant="text" onClick={hideAllColumns} size="small">
+            <MenuItem>
+              <Button variant="contained" onClick={showAllColumns} size="small">
+                全て表示
+              </Button>
+            </MenuItem>
+            <Button variant="outlined" onClick={hideAllColumns} size="small">
               全て非表示
-            </Button>
-          </MenuItem>
-          <MenuItem>
-            <Button variant="outlined" onClick={showAllColumns} size="small">
-              全て表示
             </Button>
           </MenuItem>
         </Box>
         <Box display="flex" justifyContent="center">
           <MenuItem>
-            <Button variant="outlined" onClick={handleClose} size="small">
+            <Button
+              variant="text"
+              color="secondary"
+              onClick={handleClose}
+              size="small"
+            >
               閉じる
             </Button>
           </MenuItem>

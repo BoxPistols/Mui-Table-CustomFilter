@@ -12,7 +12,7 @@ export const SortIcon = ({ direction }: SortIconProps) => {
       sx={{
         fontSize: 20,
         position: 'absolute',
-        top: '0.75em',
+        top: '0.5em',
         padding: '0 2px',
       }}
     />
@@ -21,7 +21,7 @@ export const SortIcon = ({ direction }: SortIconProps) => {
       sx={{
         fontSize: 20,
         position: 'absolute',
-        top: '0.75em',
+        top: '0.5em',
         padding: '0 2px',
       }}
     />
