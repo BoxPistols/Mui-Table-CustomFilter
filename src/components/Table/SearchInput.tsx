@@ -1,13 +1,7 @@
 // filename: SearchInput.tsx
 import { forwardRef, ForwardedRef } from 'react'
 import { ChangeEvent } from 'react'
-import {
-  Box,
-  FormControl,
-  FormLabel,
-  IconButton,
-  TextField,
-} from '@mui/material'
+import { Box, FormControl, FormLabel, IconButton, TextField } from '@mui/material'
 import { Clear } from '@mui/icons-material'
 
 type SearchInputProps = {
@@ -28,11 +22,8 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
     ref: ForwardedRef<HTMLInputElement>,
   ) => (
     <FormControl>
-      <Box display="flex" flexDirection="column">
-        <FormLabel
-          htmlFor="search-input"
-          sx={{ position: 'relative', marginBottom: -1.5, fontSize: 12 }}
-        >
+      <Box display="flex" flexDirection="column" sx={{ position: 'relative' }}>
+        <FormLabel htmlFor="search-input" sx={{ mb: 0.5, fontSize: 12 }}>
           データ検索
         </FormLabel>
         <TextField
@@ -40,19 +31,19 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           value={search}
           onChange={handleSearchChange}
           variant="outlined"
-          margin="normal"
+          margin="none"
           size="small"
           inputRef={ref}
           sx={{
-            position: 'relative',
-            marginBottom: 2,
-            minWidth: '20em',
+            mb: 1,
+            minWidth: '24em',
           }}
         />
         {!isSearchEmpty && (
           <IconButton
             onClick={handleClearSearch}
-            sx={{ position: 'absolute', top: '0.85em', right: 0 }}
+            sx={{ position: 'absolute', top: 26, right: 4 }}
+            size="small"
           >
             <Clear sx={{ fontSize: 18 }} />
           </IconButton>
