@@ -235,9 +235,7 @@ export const BasicTable = () => {
                 .map(({ label, key }) => (
                   <StyledTableCell key={key} onClick={() => handleSort(key)}>
                     {label}
-                    {sortField === key && (
-                      <SortIcon direction={sortDirection} />
-                    )}
+                    <SortIcon direction={sortField === key ? sortDirection : 'none'} />
                   </StyledTableCell>
                 ))}
               <StyledTableCell align="center" width={140}>
