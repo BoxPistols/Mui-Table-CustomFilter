@@ -29,6 +29,7 @@ import { ColumnSelector } from './ColumnSelector'
 import { useColumnSelector } from './useColumnSelector'
 // フィルタフォームをインポートします
 import { FilterForm } from './FilterForm'
+import { productsMock } from '../../mocks/products'
 
 // プロダクトの型を定義します。これはAPIから取得するデータの型です
 type Product = {
@@ -80,16 +81,32 @@ export const ApiFilterTable = () => {
   // 削除された行を追跡する新しいstateを定義します
   const [deletedRows, setDeletedRows] = useState<string[]>([])
 
-  // フィルタを定義します
-  const [filters, setFilters] = useState<Record<string, string>>({})
+  // フィルタを定義します（単一 / 複数 / 範囲）
+  type RangeFilter = { min?: number; max?: number }
+  const [filters, setFilters] = useState<Record<string, string | string[] | RangeFilter>>({})
 
-  // APIからデータを取得してrowsを設定します
+  // APIからデータを取得。失敗時やフラグ指定時はモックへフォールバックします
   useEffect(() => {
-    fetch('https://dummyjson.com/products')
-      .then((response) => response.json())
-      .then((data) => {
-        setRows(data.products)
-      })
+    let cancelled = false
+    const load = async () => {
+      try {
+        if (process.env.REACT_APP_USE_MOCK === '1') {
+          if (!cancelled) setRows(productsMock)
+          return
+        }
+        const response = await fetch('https://dummyjson.com/products')
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
+        const data = await response.json()
+        if (!cancelled)
+          setRows(Array.isArray(data?.products) ? data.products : productsMock)
+      } catch {
+        if (!cancelled) setRows(productsMock)
+      }
+    }
+    load()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   // rowsが取得・設定された後にユニークな値を計算します
@@ -117,7 +134,7 @@ export const ApiFilterTable = () => {
 
   // フィルタの変更を処理する関数を定義します
   const handleFilterChange = (
-    newFilters: React.SetStateAction<Record<string, string>>,
+    newFilters: React.SetStateAction<Record<string, string | string[] | RangeFilter>>,
   ) => {
     setFilters(newFilters)
   }
@@ -128,20 +145,23 @@ export const ApiFilterTable = () => {
   }, [filters])
 
   // フィルタリングを適用する関数を定義します
-  const filterRows = (
-    row: Product,
-    filters: { [s: string]: unknown } | ArrayLike<unknown>,
-  ) => {
-    // すべてのフィルタを順に適用します。一つでも通らないフィルタがあれば、その行は含まれません。
-    for (const [key, value] of Object.entries(filters)) {
-      if (
-        value !== '' &&
-        !String(row[key as keyof Product]).toLowerCase().includes((value as string).toLowerCase())
-      ) {
-        return false;
+  const filterRows = (row: Product, f: Record<string, string | string[] | RangeFilter>) => {
+    for (const [key, value] of Object.entries(f)) {
+      const cellRaw = row[key as keyof Product] as unknown
+      const cell = String(cellRaw).toLowerCase()
+      if (Array.isArray(value)) {
+        if (value.length > 0 && !value.some((v) => cell === String(v).toLowerCase())) return false
+      } else if (typeof value === 'object' && value !== null) {
+        const num = typeof cellRaw === 'number' ? cellRaw : Number(cellRaw)
+        if (Number.isFinite(num)) {
+          if (typeof value.min === 'number' && num < value.min) return false
+          if (typeof value.max === 'number' && num > value.max) return false
+        }
+      } else {
+        if (value !== '' && !cell.includes(String(value).toLowerCase())) return false
       }
     }
-    return true;
+    return true
   }
 
   // 行のフィルタリングとソートを適用します
@@ -259,6 +279,8 @@ export const ApiFilterTable = () => {
         onFilterChange={handleFilterChange}
         uniqueValues={uniqueValues}
         onClickClearFilters={() => setFilters({})}
+        multiSelectKeys={['category', 'brand', 'rating']}
+        rangeKeys={['price']}
       />
 
       <Box>
@@ -329,7 +351,7 @@ export const ApiFilterTable = () => {
                               <img
                                 src={row.thumbnail}
                                 alt="dummy"
-                                width={80}
+                                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                               // height={40}
                               />
                             </TableContainer>

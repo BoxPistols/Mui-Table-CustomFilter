@@ -44,3 +44,18 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## Mock API
+
+This project includes a simple mock dataset for products that is automatically used when:
+- the network request to `https://dummyjson.com/products` fails, or
+- you set the environment variable `REACT_APP_USE_MOCK=1`.
+
+How to enable mock explicitly:
+1. Create a `.env` file in the project root.
+2. Add the following line:
+   ```
+   REACT_APP_USE_MOCK=1
+   ```
+3. Restart the dev server if it is running.
+

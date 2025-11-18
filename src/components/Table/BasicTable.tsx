@@ -25,6 +25,7 @@ import { usePagination } from './usePagination'
 import { SortIcon } from './SortIcon'
 import { PagenateDesign } from './PagenateDesign'
 import { ColumnSelector } from './ColumnSelector'
+import { productsMock } from '../../mocks/products'
 // 列の表示状態を管理するカスタムフックをインポートします
 import { useColumnSelector } from './useColumnSelector'
 
@@ -78,13 +79,28 @@ export const BasicTable = () => {
   // 削除された行を追跡する新しいstateを定義します
   const [deletedRows, setDeletedRows] = useState<string[]>([])
 
-  // APIからデータを取得してrowsを設定します
+  // APIからデータを取得。失敗時やフラグ指定時はモックへフォールバックします
   useEffect(() => {
-    fetch('https://dummyjson.com/products')
-      .then((response) => response.json())
-      .then((data) => {
-        setRows(data.products)
-      })
+    let cancelled = false
+    const load = async () => {
+      try {
+        if (process.env.REACT_APP_USE_MOCK === '1') {
+          if (!cancelled) setRows(productsMock)
+          return
+        }
+        const response = await fetch('https://dummyjson.com/products')
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
+        const data = await response.json()
+        if (!cancelled)
+          setRows(Array.isArray(data?.products) ? data.products : productsMock)
+      } catch {
+        if (!cancelled) setRows(productsMock)
+      }
+    }
+    load()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   // 行のフィルタリングとソートを適用します
@@ -261,7 +277,7 @@ export const BasicTable = () => {
                               <img
                                 src={row.thumbnail}
                                 alt="dummy"
-                                width={80}
+                                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                                 // height={40}
                               />
                             </TableContainer>

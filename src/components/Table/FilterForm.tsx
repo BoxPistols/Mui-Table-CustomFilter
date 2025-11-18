@@ -1,6 +1,8 @@
 // FilterForm.tsx
-import { useState } from 'react'
-import { Box, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Button } from '@mui/material'
+import { useMemo, useState } from 'react'
+import { Box, FormControl, Select, MenuItem, SelectChangeEvent, Button, Typography } from '@mui/material'
+import { MultiSelectChips, Option } from './MultiSelectChips'
+import { RangeInputs, RangeFilter } from './RangeInputs'
 
 /**
  * 各テーブル列の情報を表す型
@@ -15,21 +17,29 @@ interface Column {
  */
 interface FilterFormProps {
   columns: Column[]
-  onFilterChange: (filters: Record<string, string>) => void
+  onFilterChange: (filters: Record<string, string | string[] | RangeFilter>) => void
   uniqueValues: Record<string, string[]>
   onClickClearFilters: () => void
+  multiSelectKeys?: string[]
+  rangeKeys?: string[]
 }
 
 /**
  * フィルターフォームコンポーネントを定義します。
  * 各テーブル列のフィルターを選択するSelectと全フィルターをクリアするボタンを表示します。
  */
-export const FilterForm = ({ columns, onFilterChange, uniqueValues, onClickClearFilters }: FilterFormProps) => {
-  const initialFilterValue = "";
-  const [filters, setFilters] = useState<Record<string, string>>(columns.reduce((acc, column) => ({
-    ...acc,
-    [column.key]: initialFilterValue
-  }), {}));
+export const FilterForm = ({ columns, onFilterChange, uniqueValues, onClickClearFilters, multiSelectKeys = [], rangeKeys = [] }: FilterFormProps) => {
+  const singleInitial = ""
+  const multiInitial: string[] = []
+  const rangeInitial: RangeFilter = {}
+  const [filters, setFilters] = useState<Record<string, string | string[] | RangeFilter>>(
+    columns.reduce<Record<string, string | string[] | RangeFilter>>((acc, column) => {
+      if (multiSelectKeys.includes(column.key)) acc[column.key] = multiInitial
+      else if (rangeKeys.includes(column.key)) acc[column.key] = rangeInitial
+      else acc[column.key] = singleInitial
+      return acc
+    }, {})
+  )
 
   /**
    * フィルターが変更されたときに実行されるハンドラ
@@ -38,7 +48,7 @@ export const FilterForm = ({ columns, onFilterChange, uniqueValues, onClickClear
   const handleFilterChange = (event: SelectChangeEvent<string>) => {
     const newFilters = {
       ...filters,
-      [event.target.name]: event.target.value || initialFilterValue,
+      [event.target.name]: event.target.value || singleInitial,
     }
     setFilters(newFilters)
     onFilterChange(newFilters)
@@ -49,50 +59,89 @@ export const FilterForm = ({ columns, onFilterChange, uniqueValues, onClickClear
    * 全てのフィルターを初期値にリセットし、親にクリアイベントを通知します。
    */
   const clearFilters = () => {
-    onClickClearFilters();
-    setFilters(columns.reduce((acc, column) => ({
-      ...acc,
-      [column.key]: initialFilterValue
-    }), {}));
+    onClickClearFilters()
+    const cleared = columns.reduce<Record<string, string | string[] | RangeFilter>>((acc, column) => {
+      if (multiSelectKeys.includes(column.key)) acc[column.key] = multiInitial
+      else if (rangeKeys.includes(column.key)) acc[column.key] = rangeInitial
+      else acc[column.key] = singleInitial
+      return acc
+    }, {})
+    setFilters(cleared)
+    onFilterChange(cleared)
   }
+
+  const asOptions = (values: string[] | undefined): Option[] =>
+    (values ?? []).map((v) => ({ label: v, value: v }))
 
   /**
    * フィルターフォームのレンダリング
    */
   return (
-    <Box display='flex' alignItems="flex-end" sx={{ gap: 2, flexWrap: 'wrap', mb: 2 }}>
-      {/* // 各テーブル列のフィルターを選択するSelectを表示します。 */}
-      {columns.map((column: Column) => (
-        <FormControl key={column.key} variant="outlined" size="small" sx={{ minWidth: 180 }}>
-          {/* // フィルターのラベルを表示します。 */}
-          <InputLabel id={`${column.key}-filter-label`} shrink htmlFor="" sx={{ position: 'relative', top: '10px', left: '-12px' }}>{column.label}</InputLabel>
-          {/* // フィルターの状態を設定し、フィルターの変更イベントを親に通知します。 */}
-          <Select
-            // フィルターの状態を設定します。
-            inputProps={{ shrink: true }}
-            // フィルターのラベルを設定します。
-            labelId={`${column.key}-filter-label`}
-            id={`${column.key}-filter`}
-            name={column.key}
-            // フィルターの状態を設定します。
-            value={filters[column.key] || initialFilterValue}
-            // フィルターの状態が変更されたときに実行されるハンドラを設定します。
-            onChange={handleFilterChange}
-            label={column.label}
-            // フィルターの選択肢のスタイルを設定します。
-            sx={{ maxWidth: 240, color: 'text.primary', '& .MuiOutlinedInput-notchedOutline': { borderColor: 'text.primary' } }}
-          >
-            {/* // フィルターの選択肢を表示します。 */}
-            <MenuItem value=""><em>None</em></MenuItem>
-            {/* // フィルターの選択肢を表示します。 */}
-            {uniqueValues[column.key]?.map((value: string) => (
-              <MenuItem key={value} value={value}>{value}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      ))
-      }
-      {/* // 全てのフィルターをクリアするボタンを表示します。 */}
+    <Box display='flex' alignItems="flex-end" sx={{ gap: 2, flexWrap: 'wrap', mb: 1 }}>
+      {columns.map((column: Column) => {
+        const isMulti = multiSelectKeys.includes(column.key)
+        const isRange = rangeKeys.includes(column.key)
+        if (isMulti) {
+          const selected = (filters[column.key] as string[]) ?? []
+          const options = asOptions(uniqueValues[column.key])
+          return (
+            <Box key={column.key} sx={{ minWidth: 280 }}>
+              <Typography variant="caption" sx={{ display: 'block', mb: 0.5 }}>
+                {column.label}
+              </Typography>
+              <MultiSelectChips
+                options={options}
+                value={selected}
+                onChange={(next) => {
+                  const updated = { ...filters, [column.key]: next }
+                  setFilters(updated)
+                  onFilterChange(updated)
+                }}
+              />
+            </Box>
+          )
+        }
+        if (isRange) {
+          const selected = (filters[column.key] as RangeFilter) ?? {}
+          return (
+            <Box key={column.key} sx={{ minWidth: 280 }}>
+              <Typography variant="caption" sx={{ display: 'block', mb: 0.5 }}>
+                {column.label}
+              </Typography>
+              <RangeInputs
+                value={selected}
+                onChange={(next) => {
+                  const updated = { ...filters, [column.key]: next }
+                  setFilters(updated)
+                  onFilterChange(updated)
+                }}
+              />
+            </Box>
+          )
+        }
+        return (
+          <Box key={column.key} sx={{ minWidth: 240 }}>
+            <Typography variant="caption" sx={{ display: 'block', mb: 0.5 }}>
+              {column.label}
+            </Typography>
+            <FormControl variant="outlined" size="small" sx={{ minWidth: 240 }}>
+              <Select
+                id={`${column.key}-filter`}
+                name={column.key}
+                value={(filters[column.key] as string) || singleInitial}
+                onChange={handleFilterChange}
+                displayEmpty
+                sx={{ color: 'text.primary', '& .MuiOutlinedInput-notchedOutline': { borderColor: 'text.primary' } }}
+              >
+                <MenuItem value=""><em>None</em></MenuItem>
+                {uniqueValues[column.key]?.map((value: string) => (
+                  <MenuItem key={value} value={value}>{value}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        )
+      })}
       <Button onClick={clearFilters} variant="outlined" sx={{ display: 'block', minWidth: 180, minHeight: 38 }}>Clear All Filters</Button>
     </Box >
   )
