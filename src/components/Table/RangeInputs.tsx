@@ -5,9 +5,12 @@ export type RangeFilter = { min?: number; max?: number }
 type RangeInputsProps = {
   value: RangeFilter
   onChange: (next: RangeFilter) => void
+  step?: number
+  min?: number
+  max?: number
 }
 
-export function RangeInputs({ value, onChange }: RangeInputsProps) {
+export function RangeInputs({ value, onChange, step, min, max }: RangeInputsProps) {
   const toDisplay = (n: number | undefined) => (typeof n === 'number' ? String(n) : '')
   const toNumber = (s: string): number | undefined => {
     if (s === '') return undefined
@@ -23,7 +26,7 @@ export function RangeInputs({ value, onChange }: RangeInputsProps) {
         label="Min"
         value={toDisplay(value.min)}
         onChange={(e) => onChange({ ...value, min: toNumber(e.target.value) })}
-        inputProps={{ min: 0 }}
+        inputProps={{ step, min, max }}
         sx={{ width: 120 }}
       />
       <TextField
@@ -32,7 +35,7 @@ export function RangeInputs({ value, onChange }: RangeInputsProps) {
         label="Max"
         value={toDisplay(value.max)}
         onChange={(e) => onChange({ ...value, max: toNumber(e.target.value) })}
-        inputProps={{ min: 0 }}
+        inputProps={{ step, min, max }}
         sx={{ width: 120 }}
       />
     </Box>

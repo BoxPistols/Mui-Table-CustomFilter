@@ -22,13 +22,14 @@ interface FilterFormProps {
   onClickClearFilters: () => void
   multiSelectKeys?: string[]
   rangeKeys?: string[]
+  rangeOptions?: Record<string, { step?: number; min?: number; max?: number }>
 }
 
 /**
  * フィルターフォームコンポーネントを定義します。
  * 各テーブル列のフィルターを選択するSelectと全フィルターをクリアするボタンを表示します。
  */
-export const FilterForm = ({ columns, onFilterChange, uniqueValues, onClickClearFilters, multiSelectKeys = [], rangeKeys = [] }: FilterFormProps) => {
+export const FilterForm = ({ columns, onFilterChange, uniqueValues, onClickClearFilters, multiSelectKeys = [], rangeKeys = [], rangeOptions = {} }: FilterFormProps) => {
   const singleInitial = ""
   const multiInitial: string[] = []
   const rangeInitial: RangeFilter = {}
@@ -103,6 +104,7 @@ export const FilterForm = ({ columns, onFilterChange, uniqueValues, onClickClear
         }
         if (isRange) {
           const selected = (filters[column.key] as RangeFilter) ?? {}
+          const opts = rangeOptions[column.key] ?? {}
           return (
             <Box key={column.key} sx={{ minWidth: 280 }}>
               <Typography variant="caption" sx={{ display: 'block', mb: 0.5 }}>
@@ -110,6 +112,9 @@ export const FilterForm = ({ columns, onFilterChange, uniqueValues, onClickClear
               </Typography>
               <RangeInputs
                 value={selected}
+                step={opts.step}
+                min={opts.min}
+                max={opts.max}
                 onChange={(next) => {
                   const updated = { ...filters, [column.key]: next }
                   setFilters(updated)

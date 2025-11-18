@@ -14,7 +14,7 @@ export type ProductMock = {
 }
 
 // できるだけ本番のデータ構造に近い形で用意
-export const productsMock: ProductMock[] = [
+const baseProducts: ProductMock[] = [
   {
     id: 1,
     title: 'Mock Phone X',
@@ -146,5 +146,33 @@ export const productsMock: ProductMock[] = [
     images: [],
   },
 ]
+
+const brands = ['Mocktel', 'MockBook', 'Mockson', 'MockView', 'MockCaps', 'MockPoint', 'MockFit', 'MockSound', 'MockGo', 'MockFly']
+const categories = ['smartphones', 'laptops', 'audio', 'monitors', 'peripherals', 'wearables', 'cameras', 'drones']
+
+const generated: ProductMock[] = Array.from({ length: 110 }, (_, i) => {
+  const id = baseProducts.length + i + 1
+  const price = 50 + ((id * 13) % 2000)
+  const discount = Number(((id * 7) % 15).toFixed(1))
+  const rating = Number((3 + ((id % 21) / 10)).toFixed(1)) // 3.0 - 5.0
+  const stock = ((id * 17) % 250) + 1
+  const brand = brands[id % brands.length]
+  const category = categories[id % categories.length]
+  return {
+    id,
+    title: `Mock Item ${id}`,
+    description: 'Generated mock product for development.',
+    price,
+    discountPercentage: discount,
+    rating,
+    stock,
+    brand,
+    category,
+    thumbnail: '/logo192.png',
+    images: [],
+  }
+})
+
+export const productsMock: ProductMock[] = [...baseProducts, ...generated]
 
 

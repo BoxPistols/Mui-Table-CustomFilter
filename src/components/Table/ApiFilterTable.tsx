@@ -279,8 +279,12 @@ export const ApiFilterTable = () => {
         onFilterChange={handleFilterChange}
         uniqueValues={uniqueValues}
         onClickClearFilters={() => setFilters({})}
-        multiSelectKeys={['category', 'brand', 'rating']}
-        rangeKeys={['price']}
+        multiSelectKeys={['category', 'brand']}
+        rangeKeys={['price', 'rating']}
+        rangeOptions={{
+          price: { step: 1, min: 0 },
+          rating: { step: 0.1, min: 0, max: 5 },
+        }}
       />
 
       <Box>
