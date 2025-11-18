@@ -1,0 +1,15 @@
+[build]
+  command = "npm run build"
+  publish = "build"
+
+[build.environment]
+  # デモで確実にデータが出るようにモックを既定で使用
+  REACT_APP_USE_MOCK = "1"
+  NODE_VERSION = "18"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+
