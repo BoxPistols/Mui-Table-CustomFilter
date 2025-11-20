@@ -14,6 +14,9 @@ export type ProductMock = {
 }
 
 // できるだけ本番のデータ構造に近い形で用意
+const getThumbnailUrl = (seed: number) =>
+  `https://picsum.photos/seed/mui-table-${seed}/160/120`
+
 const baseProducts: ProductMock[] = [
   {
     id: 1,
@@ -25,7 +28,7 @@ const baseProducts: ProductMock[] = [
     stock: 34,
     brand: 'Mocktel',
     category: 'smartphones',
-    thumbnail: '/logo192.png',
+    thumbnail: getThumbnailUrl(1),
     images: [],
   },
   {
@@ -38,7 +41,7 @@ const baseProducts: ProductMock[] = [
     stock: 18,
     brand: 'MockBook',
     category: 'laptops',
-    thumbnail: '/logo192.png',
+    thumbnail: getThumbnailUrl(2),
     images: [],
   },
   {
@@ -51,7 +54,7 @@ const baseProducts: ProductMock[] = [
     stock: 120,
     brand: 'Mockson',
     category: 'audio',
-    thumbnail: '/logo192.png',
+    thumbnail: getThumbnailUrl(3),
     images: [],
   },
   {
@@ -64,7 +67,7 @@ const baseProducts: ProductMock[] = [
     stock: 52,
     brand: 'MockView',
     category: 'monitors',
-    thumbnail: '/logo192.png',
+    thumbnail: getThumbnailUrl(4),
     images: [],
   },
   {
@@ -77,7 +80,7 @@ const baseProducts: ProductMock[] = [
     stock: 200,
     brand: 'MockCaps',
     category: 'peripherals',
-    thumbnail: '/logo192.png',
+    thumbnail: getThumbnailUrl(5),
     images: [],
   },
   {
@@ -90,7 +93,7 @@ const baseProducts: ProductMock[] = [
     stock: 160,
     brand: 'MockPoint',
     category: 'peripherals',
-    thumbnail: '/logo192.png',
+    thumbnail: getThumbnailUrl(6),
     images: [],
   },
   {
@@ -103,7 +106,7 @@ const baseProducts: ProductMock[] = [
     stock: 75,
     brand: 'MockFit',
     category: 'wearables',
-    thumbnail: '/logo192.png',
+    thumbnail: getThumbnailUrl(7),
     images: [],
   },
   {
@@ -116,7 +119,7 @@ const baseProducts: ProductMock[] = [
     stock: 140,
     brand: 'MockSound',
     category: 'audio',
-    thumbnail: '/logo192.png',
+    thumbnail: getThumbnailUrl(8),
     images: [],
   },
   {
@@ -129,7 +132,7 @@ const baseProducts: ProductMock[] = [
     stock: 65,
     brand: 'MockGo',
     category: 'cameras',
-    thumbnail: '/logo192.png',
+    thumbnail: getThumbnailUrl(9),
     images: [],
   },
   {
@@ -142,7 +145,7 @@ const baseProducts: ProductMock[] = [
     stock: 22,
     brand: 'MockFly',
     category: 'drones',
-    thumbnail: '/logo192.png',
+    thumbnail: getThumbnailUrl(10),
     images: [],
   },
 ]
@@ -168,7 +171,7 @@ const generated: ProductMock[] = Array.from({ length: 110 }, (_, i) => {
     stock,
     brand,
     category,
-    thumbnail: '/logo192.png',
+    thumbnail: getThumbnailUrl(id),
     images: [],
   }
 })
