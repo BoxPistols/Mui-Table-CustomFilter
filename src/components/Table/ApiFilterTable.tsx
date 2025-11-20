@@ -355,9 +355,19 @@ export const ApiFilterTable = () => {
                             >
                               <img
                                 src={row.thumbnail}
-                                alt="dummy"
-                                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-                              // height={40}
+                                alt={row.title}
+                                loading="lazy"
+                                referrerPolicy="no-referrer"
+                                onError={(event) => {
+                                  event.currentTarget.onerror = null
+                                  event.currentTarget.src = '/logo192.png'
+                                }}
+                                style={{
+                                  maxWidth: '100%',
+                                  maxHeight: '100%',
+                                  objectFit: 'contain',
+                                  display: 'block',
+                                }}
                               />
                             </TableContainer>
                           )}
