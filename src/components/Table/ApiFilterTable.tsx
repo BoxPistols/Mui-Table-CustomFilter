@@ -1,6 +1,6 @@
 // Reactなどの必要なライブラリやコンポーネントをインポートします
 import * as React from 'react'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import {
   Table,
   TableBody,
@@ -145,24 +145,27 @@ export const ApiFilterTable = () => {
   }, [filters])
 
   // フィルタリングを適用する関数を定義します
-  const filterRows = (row: Product, f: Record<string, string | string[] | RangeFilter>) => {
-    for (const [key, value] of Object.entries(f)) {
-      const cellRaw = row[key as keyof Product] as unknown
-      const cell = String(cellRaw).toLowerCase()
-      if (Array.isArray(value)) {
-        if (value.length > 0 && !value.some((v) => cell === String(v).toLowerCase())) return false
-      } else if (typeof value === 'object' && value !== null) {
-        const num = typeof cellRaw === 'number' ? cellRaw : Number(cellRaw)
-        if (Number.isFinite(num)) {
-          if (typeof value.min === 'number' && num < value.min) return false
-          if (typeof value.max === 'number' && num > value.max) return false
+  const filterRows = useCallback(
+    (row: Product, f: Record<string, string | string[] | RangeFilter>) => {
+      for (const [key, value] of Object.entries(f)) {
+        const cellRaw = row[key as keyof Product] as unknown
+        const cell = String(cellRaw).toLowerCase()
+        if (Array.isArray(value)) {
+          if (value.length > 0 && !value.some((v) => cell === String(v).toLowerCase())) return false
+        } else if (typeof value === 'object' && value !== null) {
+          const num = typeof cellRaw === 'number' ? cellRaw : Number(cellRaw)
+          if (Number.isFinite(num)) {
+            if (typeof value.min === 'number' && num < value.min) return false
+            if (typeof value.max === 'number' && num > value.max) return false
+          }
+        } else {
+          if (value !== '' && !cell.includes(String(value).toLowerCase())) return false
         }
-      } else {
-        if (value !== '' && !cell.includes(String(value).toLowerCase())) return false
       }
-    }
-    return true
-  }
+      return true
+    },
+    [],
+  )
 
   // 行のフィルタリングとソートを適用します
   useEffect(() => {
@@ -172,7 +175,7 @@ export const ApiFilterTable = () => {
         .filter((row) => filterRows(row, filters))
         .filter(({ id }) => !deletedRows.includes(id.toString())),
     );
-  }, [sortedRows, search, deletedRows, filters, isSearchEmpty]);
+  }, [sortedRows, search, deletedRows, filters, isSearchEmpty, filterRows]);
 
   // ユニークな値を追加するための新しいstateを追加します
   const [uniqueValues, setUniqueValues] = useState<Record<string, string[]>>({})
